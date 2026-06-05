@@ -1029,3 +1029,94 @@ Check your internet connection or see how to run the library in offline mode at 
 2026-06-05 16:13:22 [HTTPX] [INFO]  HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
 2026-06-05 16:13:22 [LLM] [INFO]  LLM 响应: finish=stop, content_len=296, tool_calls=0, 耗时 3.5s
 2026-06-05 16:13:22 [QUERY_REWRIT] [INFO]  查询改写: 5 个变体 → ['wav2vec audio feature extraction partial spoof detection...', 'self-supervised speech representation fake audio localizatio...', 'pretrained acoustic models for detecting partially manipulat...', 'audio spoofing detection with wav2vec 2.0 embeddings...', '基于wav2vec的音频特征提取用于部分伪造语音检测...']
+2026-06-05 16:14:09 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-05 16:14:09 [ROOT] [INFO]  日志系统初始化完成
+2026-06-05 16:14:09 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-05 16:14:09 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-05 16:14:09 [ROOT] [INFO]    文件级别: INFO
+2026-06-05 16:14:09 [ROOT] [INFO]    保留天数: 30
+2026-06-05 16:14:09 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-05 16:14:09 [__MAIN__] [INFO]  系统初始化完成: DB 就绪, 日志系统就绪
+2026-06-05 16:16:56 [SESSION] [INFO]  会话创建: id=8, title='新会话'
+2026-06-05 16:16:56 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 8)
+2026-06-05 16:16:56 [AGENT] [INFO] [req_20260605_161656_ac021d] ═══ 新请求开始 ═══
+2026-06-05 16:16:58 [HTTPX] [INFO] [req_20260605_161656_ac021d] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-05 16:16:58 [LLM] [INFO] [req_20260605_161656_ac021d] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.9s
+2026-06-05 16:16:58 [AGENT] [INFO] [req_20260605_161656_ac021d] LLM 决定调用 1 个工具
+2026-06-05 16:16:58 [MIDDLEWARE] [INFO] [req_20260605_161656_ac021d] 🔧 工具调用开始: search_knowledge_base | 参数: {'query': 'wav2vec 音频伪造检测 特征提取'}
+2026-06-05 16:17:01 [HTTPX] [INFO] [req_20260605_161656_ac021d] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-05 16:17:01 [LLM] [INFO] [req_20260605_161656_ac021d] LLM 响应: finish=stop, content_len=299, tool_calls=0, 耗时 2.6s
+2026-06-05 16:17:01 [QUERY_REWRIT] [INFO] [req_20260605_161656_ac021d] 查询改写: 5 个变体 → ['wav2vec audio spoofing detection feature extraction...', 'self-supervised speech representation fake audio detection...', 'audio deepfake detection using wav2vec 2.0 embeddings...', 'acoustic artifact analysis for synthetic speech identificati...', '基于wav2vec的语音伪造检测与特征表示...']
+2026-06-05 16:17:02 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] BM25 索引构建完成: 186 个 chunk
+2026-06-05 16:17:02 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 多查询检索: 6 个变体, 每路 top-15, 最终 top-5
+2026-06-05 16:17:02 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 混合检索完成: BM25=1, Semantic=0, 融合后=1
+2026-06-05 16:17:02 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 混合检索完成: BM25=30, Semantic=0, 融合后=15
+2026-06-05 16:17:03 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 混合检索完成: BM25=30, Semantic=0, 融合后=15
+2026-06-05 16:17:03 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 混合检索完成: BM25=30, Semantic=0, 融合后=15
+2026-06-05 16:17:03 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 混合检索完成: BM25=30, Semantic=0, 融合后=15
+2026-06-05 16:17:03 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 混合检索完成: BM25=1, Semantic=0, 融合后=1
+2026-06-05 16:17:03 [RETRIEVER] [INFO] [req_20260605_161656_ac021d] 候选池: 50 个去重候选 (来自 6 个变体)
+2026-06-05 16:17:04 [RERANKER] [INFO] [req_20260605_161656_ac021d] 加载 Cross-Encoder 模型: BAAI/bge-reranker-large
+2026-06-05 16:17:04 [MODEL] [INFO] [req_20260605_161656_ac021d] No device provided, using cpu
+2026-06-05 16:17:04 [HTTPX] [INFO] [req_20260605_161656_ac021d] HTTP Request: HEAD https://hf-mirror.com/BAAI/bge-reranker-large/resolve/main/modules.json "HTTP/1.1 308 Permanent Redirect"
+2026-06-05 16:17:04 [MODEL] [INFO] [req_20260605_161656_ac021d] No modules.json found for BAAI/bge-reranker-large, initializing a new CrossEncoder model.
+2026-06-05 16:17:04 [HTTPX] [INFO] [req_20260605_161656_ac021d] HTTP Request: GET https://hf-mirror.com/api/models/BAAI/bge-reranker-large "HTTP/1.1 308 Permanent Redirect"
+2026-06-05 16:17:05 [HTTPX] [INFO] [req_20260605_161656_ac021d] HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-reranker-large "HTTP/1.1 200 OK"
+2026-06-05 16:17:05 [HTTPX] [INFO] [req_20260605_161656_ac021d] HTTP Request: HEAD https://hf-mirror.com/BAAI/bge-reranker-large/resolve/main/config.json "HTTP/1.1 308 Permanent Redirect"
+2026-06-05 16:17:05 [RERANKER] [ERROR] [req_20260605_161656_ac021d] 重排序失败: We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.，回退到 RRF 排序
+Traceback (most recent call last):
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 1696, in _get_metadata_or_catch_error
+    raise FileMetadataError(
+huggingface_hub.errors.FileMetadataError: Distant resource does not seem to be on huggingface.co. It is possible that a configuration issue prevents you from downloading resources from https://huggingface.co. Please check your firewall and proxy settings and make sure your SSL certificates are updated.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\utils\hub.py", line 437, in cached_files
+    hf_hub_download(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\utils\_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 997, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 1148, in _hf_hub_download_to_cache_dir
+    _raise_on_head_call_error(head_call_error, force_download, local_files_only)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 1785, in _raise_on_head_call_error
+    raise LocalEntryNotFoundError(
+huggingface_hub.errors.LocalEntryNotFoundError: An error happened while trying to locate the file on the Hub and we cannot find the requested files in the local cache. Please check your connection and try again or make sure your Internet connection is on.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\科研助手agent\knowledge_base\reranker.py", line 68, in rerank
+    model = get_reranker()
+  File "F:\科研助手agent\knowledge_base\reranker.py", line 23, in get_reranker
+    _reranker = CrossEncoder(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\util\decorators.py", line 160, in wrapper
+    return func(self, *args, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\cross_encoder\model.py", line 182, in __init__
+    super().__init__(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\base\model.py", line 204, in __init__
+    modules, self.module_kwargs = self._load_modules(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\base\model.py", line 982, in _load_modules
+    return self._load_default_modules(model_name_or_path, **load_kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\cross_encoder\model.py", line 233, in _load_default_modules
+    config: PretrainedConfig = AutoConfig.from_pretrained(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\models\auto\configuration_auto.py", line 374, in from_pretrained
+    config_dict, unused_kwargs = PreTrainedConfig.get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\configuration_utils.py", line 685, in get_config_dict
+    config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\configuration_utils.py", line 740, in _get_config_dict
+    resolved_config_file = cached_file(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\utils\hub.py", line 293, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\utils\hub.py", line 513, in cached_files
+    raise OSError(
+OSError: We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.
+
+2026-06-05 16:17:05 [TOOL] [INFO] [req_20260605_161656_ac021d] 多查询检索完成: 5 个结果, top_score=0.0164
+2026-06-05 16:17:05 [MIDDLEWARE] [INFO] [req_20260605_161656_ac021d] ✅ 工具调用完成: search_knowledge_base | 耗时 7.11s | 检索到 5 个相关片段, top_score=0.016393
+2026-06-05 16:17:28 [HTTPX] [INFO] [req_20260605_161656_ac021d] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-05 16:17:28 [LLM] [INFO] [req_20260605_161656_ac021d] LLM 响应: finish=stop, content_len=1439, tool_calls=0, 耗时 22.9s
+2026-06-05 16:17:28 [AGENT] [INFO] [req_20260605_161656_ac021d] ═══ 请求完成, 总耗时 32.0s, 回复长度 1439 字符, 工具调用 1 次 ═══

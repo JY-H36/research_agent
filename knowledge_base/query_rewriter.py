@@ -14,36 +14,23 @@ logger = get_logger(__name__)
 # ============================================================
 # 查询改写 Prompt
 # ============================================================
-REWRITE_PROMPT = """You are an academic search expert with broad knowledge across all research fields. Your task is to expand a single research question into {N} diverse search queries, improving recall in academic databases where different papers use different terminology for the same concepts.
+REWRITE_PROMPT = """You are an academic search expert. Rewrite the user's research question into {N} different search queries.
+Each query should use different terminology and look at the problem from a different angle.
 
-## Rewriting Strategy
-
-For the given question, think through these steps before writing:
-
-1. **Identify core concepts**: Extract 2–4 key concepts from the question (e.g., a task, a method, a model, a dataset, a domain).
-
-2. **Diversify each concept**: For each core concept, use your broad academic knowledge to list alternative terms that different research communities might use. Consider:
-   - Full names vs. abbreviations vs. code names for models/methods
-   - Functional descriptions as alternatives to brand names (e.g., a specific model can also be described by what it does)
-   - Different academic communities' preferred terminology for the same idea
-   - Broader and narrower terms (hypernyms and hyponyms)
-
-3. **Vary the angle**: Each query should emphasize a different combination of concepts or a different perspective:
-   - One query focused on the method/architecture
-   - One query focused on the task/problem formulation
-   - One query using broader conceptual terms rather than specific brand names
-   - One query closer to the user's original phrasing but with key terms swapped
-   - If the input contains Chinese, include one Chinese-language query
-
-4. **Keep queries concise**: Each query should be a keyword phrase (≤20 words), not a full question. Remove filler words like "有没有", "如何", "system", "method", "research on".
-
-## Output
-
-Return ONLY a JSON array of exactly {N} strings. No explanation, no markdown, just the raw JSON array.
+Rules:
+1. Core concepts: expand synonyms aggressively (e.g., spoofing=fake=forgery=manipulation=tampering,
+   detection=identification=localization=recognition, totally different usage expressions for the same task: partial spoofing vs partially fake audio vs audio forgery localization vs manipulated region detection)
+2. Model names: expand to full names and code names (e.g., wav2vec=wav2vec2=wav2vec 2.0=self-supervised speech model=pre-trained speech representation)
+3. Remove filler words (e.g., "system", "method", "preliminary", "有没有", "如何")
+4. Include exactly ONE Chinese-language variant for searching Chinese content
+5. Each query should be a concise keyword phrase (≤20 words)
+6. Focus on technical search terms, not full questions
+7. Ensure diversity: each query should emphasize different aspects (method, task, model, evaluation, etc.)
+8. For each generated query, you should consider whether there is a completely different way to express the same thing in academia,
 
 User question: {question}
 
-JSON array:"""
+Output ONLY a JSON array with {N} strings, nothing else. Example: ["query1", "query2", ...]"""
 
 
 def rewrite_query(question: str, num_variants: int = QUERY_VARIANTS) -> List[str]:
