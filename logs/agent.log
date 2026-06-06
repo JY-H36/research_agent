@@ -70,3 +70,49 @@
 2026-06-06 10:50:21 [HTTPX] [INFO] [req_20260606_104957_5251a4] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
 2026-06-06 10:50:21 [LLM] [INFO] [req_20260606_104957_5251a4] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 2.0s
 2026-06-06 10:50:21 [AGENT] [INFO] [req_20260606_104957_5251a4] ═══ 请求完成, 总耗时 24.5s, 回复长度 0 字符, 工具调用 1 次 ═══
+2026-06-06 10:55:07 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 10:55:07 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 10:55:07 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 10:55:07 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 10:55:07 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 10:55:07 [ROOT] [INFO]    保留天数: 30
+2026-06-06 10:55:07 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 10:55:07 [__MAIN__] [INFO]  系统初始化完成: DB 就绪, 日志系统就绪
+2026-06-06 10:55:45 [SESSION] [INFO]  会话创建: id=10, title='新会话'
+2026-06-06 10:55:45 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 10)
+2026-06-06 10:55:45 [AGENT] [INFO] [req_20260606_105545_d94dab] ═══ 新请求开始 ═══
+2026-06-06 10:55:48 [HTTPX] [INFO] [req_20260606_105545_d94dab] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 10:55:48 [LLM] [INFO] [req_20260606_105545_d94dab] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 2.3s
+2026-06-06 10:55:48 [AGENT] [INFO] [req_20260606_105545_d94dab] LLM 决定调用 1 个工具
+2026-06-06 10:55:48 [MIDDLEWARE] [INFO] [req_20260606_105545_d94dab] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'object detection survey review', 'limit': 5, 'source': 'all'}
+2026-06-06 10:55:48 [PAPER_SEARCH] [INFO] [req_20260606_105545_d94dab] 论文检索: query='object detection survey review', limit=5, source=all
+2026-06-06 10:55:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 10:55:55 [PAPER_SEARCH] [INFO] [req_20260606_105545_d94dab] 论文检索完成: 5 篇 (总候选=40, 去重后=10, 数据源警告=0)
+2026-06-06 10:56:25 [HTTPX] [INFO] [req_20260606_105545_d94dab] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 10:56:25 [LLM] [INFO] [req_20260606_105545_d94dab] LLM 响应: finish=stop, content_len=1969, tool_calls=0, 耗时 30.0s
+2026-06-06 10:56:25 [PAPER_SEARCH] [INFO] [req_20260606_105545_d94dab] 摘要翻译: 5/5 篇
+2026-06-06 10:56:25 [MIDDLEWARE] [INFO] [req_20260606_105545_d94dab] ✅ 工具调用完成: search_papers_online | 耗时 37.23s | 检索到 5 篇论文
+2026-06-06 10:56:26 [HTTPX] [INFO] [req_20260606_105545_d94dab] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 10:56:26 [LLM] [INFO] [req_20260606_105545_d94dab] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.3s
+2026-06-06 10:56:26 [AGENT] [INFO] [req_20260606_105545_d94dab] ═══ 请求完成, 总耗时 40.9s, 回复长度 0 字符, 工具调用 1 次 ═══
+2026-06-06 10:58:58 [SESSION] [INFO]  会话创建: id=11, title='新会话'
+2026-06-06 10:58:58 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 11)
+2026-06-06 10:59:03 [AGENT] [INFO]  切换会话: 11 → 10
+2026-06-06 10:59:07 [AGENT] [INFO]  切换会话: 10 → 9
+2026-06-06 10:59:10 [AGENT] [INFO]  切换会话: 9 → 10
+2026-06-06 10:59:46 [AGENT] [INFO] [req_20260606_105946_1b3b81] ═══ 新请求开始 ═══
+2026-06-06 10:59:48 [HTTPX] [INFO] [req_20260606_105946_1b3b81] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 10:59:48 [LLM] [INFO] [req_20260606_105946_1b3b81] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 2.2s
+2026-06-06 10:59:48 [AGENT] [INFO] [req_20260606_105946_1b3b81] LLM 决定调用 1 个工具
+2026-06-06 10:59:48 [MIDDLEWARE] [INFO] [req_20260606_105946_1b3b81] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'object detection survey review', 'limit': 5, 'source': 'all'}
+2026-06-06 10:59:48 [PAPER_SEARCH] [INFO] [req_20260606_105946_1b3b81] 论文检索: query='object detection survey review', limit=5, source=all
+2026-06-06 10:59:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 10:59:55 [PAPER_SEARCH] [INFO] [req_20260606_105946_1b3b81] 论文检索完成: 5 篇 (总候选=40, 去重后=10, 数据源警告=0)
+2026-06-06 11:00:37 [HTTPX] [INFO] [req_20260606_105946_1b3b81] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 11:00:37 [LLM] [INFO] [req_20260606_105946_1b3b81] LLM 响应: finish=stop, content_len=2247, tool_calls=0, 耗时 41.5s
+2026-06-06 11:00:37 [PAPER_SEARCH] [INFO] [req_20260606_105946_1b3b81] 摘要翻译: 5/5 篇
+2026-06-06 11:00:37 [MIDDLEWARE] [INFO] [req_20260606_105946_1b3b81] ✅ 工具调用完成: search_papers_online | 耗时 48.55s | 检索到 5 篇论文
+2026-06-06 11:00:38 [HTTPX] [INFO] [req_20260606_105946_1b3b81] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 11:00:38 [LLM] [INFO] [req_20260606_105946_1b3b81] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.7s
+2026-06-06 11:00:38 [AGENT] [INFO] [req_20260606_105946_1b3b81] ═══ 请求完成, 总耗时 52.5s, 回复长度 0 字符, 工具调用 1 次 ═══
+2026-06-06 11:08:37 [AGENT] [INFO]  切换会话: 10 → 9
