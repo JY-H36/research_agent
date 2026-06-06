@@ -91,6 +91,7 @@ class ResearchAgent:
         final_response = ""
         all_tool_calls = []
         all_retrieved_chunks = []
+        all_papers = []
 
         try:
             response = chat_completion(messages=context_messages, tools=TOOL_DEFINITIONS)
@@ -115,6 +116,9 @@ class ResearchAgent:
 
                     if tc["name"] == "search_knowledge_base" and result.get("chunks"):
                         all_retrieved_chunks.extend(result["chunks"])
+
+                    if tc["name"] == "search_papers_online" and result.get("papers"):
+                        all_papers.extend(result["papers"])
 
                 # 构建包含工具调用结果的消息
                 assistant_tool_msg = response["choices"][0]["message"]
@@ -162,6 +166,7 @@ class ResearchAgent:
             "response": final_response,
             "tool_calls": all_tool_calls,
             "retrieved_chunks": all_retrieved_chunks,
+            "papers": all_papers,
             "middleware_logs": self.middleware.get_logs(),
         }
 

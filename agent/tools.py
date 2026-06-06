@@ -40,6 +40,48 @@ TOOL_DEFINITIONS = [
                 "required": ["query"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_papers_online",
+            "description": (
+                "从互联网学术数据库（arXiv + Semantic Scholar + OpenAlex）检索论文。"
+                "当用户想要查找最新论文、了解某个方向的研究现状、"
+                "或知识库中缺少相关内容时使用此工具。"
+                "返回论文的标题、作者、年份、摘要（中英文）、下载链接等信息。"
+                "支持选择数据源和按年份过滤。"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "搜索关键词，英文效果更好，如 'audio deepfake detection wav2vec'"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": f"期望返回的论文篇数，默认 {RETRIEVAL_TOP_K * 2} 篇。如果搜索不到足够论文则返回实际数量",
+                        "default": RETRIEVAL_TOP_K * 2,
+                    },
+                    "source": {
+                        "type": "string",
+                        "enum": ["all", "arxiv", "semantic_scholar", "openalex"],
+                        "description": "数据源: all=全部, arxiv=arXiv预印本, semantic_scholar=Semantic Scholar, openalex=OpenAlex开放索引",
+                        "default": "all",
+                    },
+                    "since_year": {
+                        "type": "integer",
+                        "description": "论文起始年份，如 2022。不指定则默认近3年",
+                    },
+                    "until_year": {
+                        "type": "integer",
+                        "description": "论文截止年份，如 2024",
+                    }
+                },
+                "required": ["query"]
+            }
+        }
     }
 ]
 
@@ -55,6 +97,8 @@ def execute_tool(tool_name: str, arguments: Dict) -> Dict:
 
     if tool_name == "search_knowledge_base":
         return _search_knowledge_base(arguments)
+    elif tool_name == "search_papers_online":
+        return _search_papers_online(arguments)
     else:
         logger.warning("未知工具调用: %s", tool_name)
         return {"success": False, "result": None, "error": f"未知工具: {tool_name}"}
@@ -141,6 +185,81 @@ def _format_search_results(chunks: List[Dict], query_variants: List[str] = None)
     return '\n'.join(lines)
 
 
+def _search_papers_online(args: Dict) -> Dict:
+    """执行联网论文检索（三源并行 + 年份过滤）"""
+    query = args.get("query", "")
+    limit = args.get("limit", RETRIEVAL_TOP_K * 2)
+    source = args.get("source", "all")
+    since_year = args.get("since_year")
+    until_year = args.get("until_year")
+
+    if not query:
+        logger.warning("检索查询为空")
+        return {"success": False, "result": None, "error": "查询内容不能为空"}
+
+    try:
+        from knowledge_base.paper_search import search_papers, translate_abstracts
+
+        logger.debug("开始联网检索: query='%s', limit=%d, source=%s", query[:100], limit, source)
+        papers = search_papers(
+            query=query,
+            limit=limit,
+            source=source,
+            since_year=since_year,
+            until_year=until_year,
+        )
+
+        if not papers:
+            return {
+                "success": True,
+                "result": f"未在学术数据库中找到与「{query}」相关的论文。请尝试更换关键词。",
+                "papers": [],
+            }
+
+        # 翻译摘要
+        papers = translate_abstracts(papers)
+
+        # 格式化结果
+        formatted = _format_paper_results(papers, query)
+
+        return {
+            "success": True,
+            "result": formatted["text"],
+            "papers": papers,
+            "result_type": "paper_search",  # 标记结果类型，供前端渲染卡片
+        }
+    except Exception as e:
+        logger.error("联网论文检索异常: %s", e, exc_info=True)
+        return {"success": False, "result": None, "error": str(e)}
+
+
+def _format_paper_results(papers: List[Dict], query: str) -> Dict:
+    """格式化论文检索结果：
+    - llm_text: 给 LLM 的简洁摘要（控制长度，避免撑爆上下文）
+    - papers: 完整论文数据（前端渲染卡片用）
+    """
+    # LLM 只需要简洁摘要来组织回复，详细内容由前端卡片展示
+    llm_lines = [f"检索到 {len(papers)} 篇与「{query}」相关的论文："]
+    for i, p in enumerate(papers):
+        authors_str = ", ".join(p.get("authors", [])[:3])
+        if len(p.get("authors", [])) > 3:
+            authors_str += " et al."
+        year_str = f" ({p['year']})" if p.get("year") else ""
+        venue_str = f" — {p.get('venue', '')}" if p.get("venue") else ""
+        citations = f" [引用:{p['citation_count']}]" if p.get("citation_count") else ""
+        # 只取摘要第一句（最精炼的核心内容）
+        first_sentence = ""
+        if p.get("abstract"):
+            first_sentence = p["abstract"].split(". ")[0][:200]
+        llm_lines.append(
+            f"{i + 1}. {p['title']}{year_str}{venue_str}{citations}\n"
+            f"   {authors_str}"
+            + (f"\n   {first_sentence}." if first_sentence else "")
+        )
+
+    return {"text": "\n".join(llm_lines), "papers": papers}
+
+
 def get_tool_result_summary(tool_name: str, result: Dict) -> str:
     """生成工具执行结果的简要摘要"""
     if not result.get("success"):
@@ -151,5 +270,11 @@ def get_tool_result_summary(tool_name: str, result: Dict) -> str:
         if chunks:
             return f"检索到 {len(chunks)} 个相关片段, top_score={chunks[0].get('relevance_score', 'N/A')}"
         return "未检索到相关内容"
+
+    if tool_name == "search_papers_online":
+        papers = result.get("papers", [])
+        if papers:
+            return f"检索到 {len(papers)} 篇论文"
+        return "未检索到相关论文"
 
     return "执行成功"
