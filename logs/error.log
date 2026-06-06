@@ -4,3 +4,29 @@
 2026-06-06 10:50:06 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
 2026-06-06 10:55:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
 2026-06-06 10:59:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:31:10 [TOOL] [ERROR] [req_20260606_113107_7fc362] 联网论文检索异常: No module named 'knowledge_base.paper_search'
+Traceback (most recent call last):
+  File "F:\科研助手agent\agent\tools.py", line 194, in _search_papers_online
+    from knowledge_base.paper_search import search_papers, translate_abstracts
+ModuleNotFoundError: No module named 'knowledge_base.paper_search'
+
+2026-06-06 11:31:10 [MIDDLEWARE] [ERROR] [req_20260606_113107_7fc362] ❌ 工具调用失败: search_papers_online | 耗时 0.00s | 执行失败: No module named 'knowledge_base.paper_search'
+2026-06-06 11:33:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:45:23 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
+2026-06-06 11:45:31 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:45:40 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:46:05 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
+2026-06-06 11:46:12 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:46:37 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
+2026-06-06 11:46:40 [PAPER_SEARCH] [ERROR]  PDF 下载失败: 404 Client Error: Not Found for url: https://ieeexplore.ieee.org/ielx7/6287639/6514899/10154048.pdf
+2026-06-06 11:56:41 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: Direct request failed after 2 retries
+2026-06-06 11:56:49 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: Direct request failed after 2 retries
+2026-06-06 11:56:49 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 12:03:35 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:03:39 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+wav2vec&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
+2026-06-06 12:03:48 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:08:48 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=text+steganography+survey&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
+2026-06-06 12:08:58 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:10:05 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:13:23 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+survey&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
+2026-06-06 12:13:34 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)

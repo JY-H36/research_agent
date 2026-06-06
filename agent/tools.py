@@ -50,7 +50,6 @@ TOOL_DEFINITIONS = [
                 "当用户想要查找最新论文、了解某个方向的研究现状、"
                 "或知识库中缺少相关内容时使用此工具。"
                 "返回论文的标题、作者、年份、摘要（中英文）、下载链接等信息。"
-                "支持选择数据源和按年份过滤。"
             ),
             "parameters": {
                 "type": "object",
@@ -61,23 +60,19 @@ TOOL_DEFINITIONS = [
                     },
                     "limit": {
                         "type": "integer",
-                        "description": f"期望返回的论文篇数，默认 {RETRIEVAL_TOP_K * 2} 篇。如果搜索不到足够论文则返回实际数量",
+                        "description": f"期望返回的论文篇数，默认 {RETRIEVAL_TOP_K * 2} 篇",
                         "default": RETRIEVAL_TOP_K * 2,
                     },
                     "source": {
                         "type": "string",
                         "enum": ["all", "arxiv", "semantic_scholar", "openalex"],
-                        "description": "数据源: all=全部, arxiv=arXiv预印本, semantic_scholar=Semantic Scholar, openalex=OpenAlex开放索引",
+                        "description": "数据源: all=全部, arxiv=arXiv, semantic_scholar=Semantic Scholar, openalex=OpenAlex",
                         "default": "all",
                     },
                     "since_year": {
                         "type": "integer",
-                        "description": "论文起始年份，如 2022。不指定则默认近3年",
+                        "description": "论文起始年份，如 2022",
                     },
-                    "until_year": {
-                        "type": "integer",
-                        "description": "论文截止年份，如 2024",
-                    }
                 },
                 "required": ["query"]
             }
@@ -191,42 +186,25 @@ def _search_papers_online(args: Dict) -> Dict:
     limit = args.get("limit", RETRIEVAL_TOP_K * 2)
     source = args.get("source", "all")
     since_year = args.get("since_year")
-    until_year = args.get("until_year")
 
     if not query:
-        logger.warning("检索查询为空")
         return {"success": False, "result": None, "error": "查询内容不能为空"}
 
     try:
         from knowledge_base.paper_search import search_papers, translate_abstracts
-
-        logger.debug("开始联网检索: query='%s', limit=%d, source=%s", query[:100], limit, source)
-        papers = search_papers(
-            query=query,
-            limit=limit,
-            source=source,
-            since_year=since_year,
-            until_year=until_year,
-        )
+        papers = search_papers(query=query, limit=limit, source=source, since_year=since_year)
 
         if not papers:
-            return {
-                "success": True,
-                "result": f"未在学术数据库中找到与「{query}」相关的论文。请尝试更换关键词。",
-                "papers": [],
-            }
+            return {"success": True, "result": f"未在学术数据库中找到与「{query}」相关的论文。", "papers": []}
 
-        # 翻译摘要
         papers = translate_abstracts(papers)
-
-        # 格式化结果
         formatted = _format_paper_results(papers, query)
 
         return {
             "success": True,
             "result": formatted["text"],
             "papers": papers,
-            "result_type": "paper_search",  # 标记结果类型，供前端渲染卡片
+            "result_type": "paper_search",
         }
     except Exception as e:
         logger.error("联网论文检索异常: %s", e, exc_info=True)
@@ -234,12 +212,8 @@ def _search_papers_online(args: Dict) -> Dict:
 
 
 def _format_paper_results(papers: List[Dict], query: str) -> Dict:
-    """格式化论文检索结果：
-    - llm_text: 给 LLM 的简洁摘要（控制长度，避免撑爆上下文）
-    - papers: 完整论文数据（前端渲染卡片用）
-    """
-    # LLM 只需要简洁摘要来组织回复，详细内容由前端卡片展示
-    llm_lines = [f"检索到 {len(papers)} 篇与「{query}」相关的论文："]
+    """格式化论文结果：llm_text 给 LLM（简洁），papers 给前端卡片"""
+    llm_lines = [f"检索到 {len(papers)} 篇与「{query}」相关的论文。请对以下论文进行简要总结分析："]
     for i, p in enumerate(papers):
         authors_str = ", ".join(p.get("authors", [])[:3])
         if len(p.get("authors", [])) > 3:
@@ -247,17 +221,57 @@ def _format_paper_results(papers: List[Dict], query: str) -> Dict:
         year_str = f" ({p['year']})" if p.get("year") else ""
         venue_str = f" — {p.get('venue', '')}" if p.get("venue") else ""
         citations = f" [引用:{p['citation_count']}]" if p.get("citation_count") else ""
-        # 只取摘要第一句（最精炼的核心内容）
         first_sentence = ""
         if p.get("abstract"):
             first_sentence = p["abstract"].split(". ")[0][:200]
         llm_lines.append(
             f"{i + 1}. {p['title']}{year_str}{venue_str}{citations}\n"
-            f"   {authors_str}"
-            + (f"\n   {first_sentence}." if first_sentence else "")
+            f"   作者: {authors_str}"
+            + (f"\n   摘要首句: {first_sentence}." if first_sentence else "")
         )
-
     return {"text": "\n".join(llm_lines), "papers": papers}
+
+
+# 论文结果嵌入标记（用于在消息中持久化存储论文元数据）
+PAPERS_JSON_MARKER = "\n\n<!--PAPERS_JSON-->\n"
+
+
+def encode_papers_in_message(content: str, papers: List[Dict]) -> str:
+    """将论文元数据编码到消息内容末尾，实现持久化"""
+    if not papers:
+        return content
+    import json as _json
+    # 只保留前端渲染卡片需要的字段
+    compact = []
+    for p in papers:
+        compact.append({
+            "title": p.get("title", ""),
+            "authors": p.get("authors", [])[:8],
+            "year": p.get("year", ""),
+            "venue": p.get("venue", ""),
+            "abstract": (p.get("abstract", "") or "")[:600],
+            "abstract_cn": (p.get("abstract_cn", "") or "")[:600],
+            "pdf_url": p.get("pdf_url", ""),
+            "url": p.get("url", ""),
+            "arxiv_id": p.get("arxiv_id", ""),
+            "citation_count": p.get("citation_count", 0) or 0,
+            "source": p.get("source", ""),
+            "paper_id": p.get("paper_id", ""),
+        })
+    return content + PAPERS_JSON_MARKER + _json.dumps(compact, ensure_ascii=False)
+
+
+def decode_papers_from_message(content: str) -> tuple:
+    """从消息内容中提取论文元数据，返回 (clean_content, papers_list)"""
+    if PAPERS_JSON_MARKER not in content:
+        return content, []
+    import json as _json
+    clean, _, json_str = content.partition(PAPERS_JSON_MARKER)
+    try:
+        papers = _json.loads(json_str.strip())
+        return clean, papers
+    except _json.JSONDecodeError:
+        return content, []
 
 
 def get_tool_result_summary(tool_name: str, result: Dict) -> str:

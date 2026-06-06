@@ -116,3 +116,97 @@
 2026-06-06 11:00:38 [LLM] [INFO] [req_20260606_105946_1b3b81] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.7s
 2026-06-06 11:00:38 [AGENT] [INFO] [req_20260606_105946_1b3b81] ═══ 请求完成, 总耗时 52.5s, 回复长度 0 字符, 工具调用 1 次 ═══
 2026-06-06 11:08:37 [AGENT] [INFO]  切换会话: 10 → 9
+2026-06-06 11:30:53 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:30:53 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 11:30:53 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 11:30:53 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 11:30:53 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 11:30:53 [ROOT] [INFO]    保留天数: 30
+2026-06-06 11:30:53 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:30:53 [__MAIN__] [INFO]  系统初始化完成: DB 就绪, 日志系统就绪
+2026-06-06 11:30:56 [SESSION] [INFO]  会话创建: id=12, title='新会话'
+2026-06-06 11:30:56 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 12)
+2026-06-06 11:30:58 [AGENT] [INFO]  切换会话: 12 → 12
+2026-06-06 11:30:59 [AGENT] [INFO]  切换会话: 12 → 10
+2026-06-06 11:31:07 [AGENT] [INFO] [req_20260606_113107_7fc362] ═══ 新请求开始 ═══
+2026-06-06 11:31:10 [HTTPX] [INFO] [req_20260606_113107_7fc362] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 11:31:10 [LLM] [INFO] [req_20260606_113107_7fc362] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 2.2s
+2026-06-06 11:31:10 [AGENT] [INFO] [req_20260606_113107_7fc362] LLM 决定调用 1 个工具
+2026-06-06 11:31:10 [MIDDLEWARE] [INFO] [req_20260606_113107_7fc362] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'object detection survey review', 'limit': 5}
+2026-06-06 11:31:10 [TOOL] [ERROR] [req_20260606_113107_7fc362] 联网论文检索异常: No module named 'knowledge_base.paper_search'
+Traceback (most recent call last):
+  File "F:\科研助手agent\agent\tools.py", line 194, in _search_papers_online
+    from knowledge_base.paper_search import search_papers, translate_abstracts
+ModuleNotFoundError: No module named 'knowledge_base.paper_search'
+
+2026-06-06 11:31:10 [MIDDLEWARE] [ERROR] [req_20260606_113107_7fc362] ❌ 工具调用失败: search_papers_online | 耗时 0.00s | 执行失败: No module named 'knowledge_base.paper_search'
+2026-06-06 11:31:13 [HTTPX] [INFO] [req_20260606_113107_7fc362] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 11:31:13 [LLM] [INFO] [req_20260606_113107_7fc362] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 3.0s
+2026-06-06 11:31:13 [AGENT] [INFO] [req_20260606_113107_7fc362] ═══ 请求完成, 总耗时 5.2s, 回复长度 0 字符, 工具调用 1 次 ═══
+2026-06-06 11:33:36 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:33:36 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 11:33:36 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 11:33:36 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 11:33:36 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 11:33:36 [ROOT] [INFO]    保留天数: 30
+2026-06-06 11:33:36 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:33:36 [__MAIN__] [INFO]  系统初始化完成: DB 就绪, 日志系统就绪
+2026-06-06 11:33:38 [SESSION] [INFO]  会话创建: id=13, title='新会话'
+2026-06-06 11:33:38 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 13)
+2026-06-06 11:33:41 [AGENT] [INFO]  切换会话: 13 → 10
+2026-06-06 11:33:46 [AGENT] [INFO] [req_20260606_113346_a65e05] ═══ 新请求开始 ═══
+2026-06-06 11:33:48 [HTTPX] [INFO] [req_20260606_113346_a65e05] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 11:33:48 [LLM] [INFO] [req_20260606_113346_a65e05] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 2.2s
+2026-06-06 11:33:48 [AGENT] [INFO] [req_20260606_113346_a65e05] LLM 决定调用 1 个工具
+2026-06-06 11:33:48 [MIDDLEWARE] [INFO] [req_20260606_113346_a65e05] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'object detection survey review', 'limit': 5, 'since_year': 2018}
+2026-06-06 11:33:48 [PAPER_SEARCH] [INFO] [req_20260606_113346_a65e05] 论文检索: 'object detection survey review', limit=5, source=all
+2026-06-06 11:33:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:33:55 [PAPER_SEARCH] [INFO] [req_20260606_113346_a65e05] 检索完成: 5 篇
+2026-06-06 11:34:17 [HTTPX] [INFO] [req_20260606_113346_a65e05] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 11:34:17 [LLM] [INFO] [req_20260606_113346_a65e05] LLM 响应: finish=stop, content_len=1998, tool_calls=0, 耗时 22.2s
+2026-06-06 11:34:17 [MIDDLEWARE] [INFO] [req_20260606_113346_a65e05] ✅ 工具调用完成: search_papers_online | 耗时 29.11s | 检索到 5 篇论文
+2026-06-06 11:34:46 [HTTPX] [INFO] [req_20260606_113346_a65e05] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 11:34:46 [LLM] [INFO] [req_20260606_113346_a65e05] LLM 响应: finish=stop, content_len=1898, tool_calls=0, 耗时 28.3s
+2026-06-06 11:34:46 [AGENT] [INFO] [req_20260606_113346_a65e05] ═══ 请求完成, 总耗时 59.7s, 回复长度 1898 字符, 工具调用 1 次 ═══
+2026-06-06 11:44:51 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:44:51 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 11:44:51 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 11:44:51 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 11:44:51 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 11:44:51 [ROOT] [INFO]    保留天数: 30
+2026-06-06 11:44:51 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:45:23 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
+2026-06-06 11:45:31 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:45:32 [PAPER_SEARCH] [INFO]  论文检索: 'audio deepfake detection wav2vec', limit=5, source=all
+2026-06-06 11:45:40 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:46:05 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
+2026-06-06 11:46:05 [PAPER_SEARCH] [INFO]  检索完成: 5 篇
+2026-06-06 11:46:05 [PAPER_SEARCH] [INFO]  论文检索: 'audio deepfake detection wav2vec', limit=3, source=all
+2026-06-06 11:46:12 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:46:37 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
+2026-06-06 11:46:37 [PAPER_SEARCH] [INFO]  检索完成: 3 篇
+2026-06-06 11:46:40 [PAPER_SEARCH] [ERROR]  PDF 下载失败: 404 Client Error: Not Found for url: https://ieeexplore.ieee.org/ielx7/6287639/6514899/10154048.pdf
+2026-06-06 11:56:23 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:56:23 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 11:56:23 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 11:56:23 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 11:56:23 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 11:56:23 [ROOT] [INFO]    保留天数: 30
+2026-06-06 11:56:23 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 11:56:41 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: Direct request failed after 2 retries
+2026-06-06 11:56:41 [PAPER_SEARCH] [INFO]  论文检索: 'wav2vec audio deepfake detection', limit=5, source=all
+2026-06-06 11:56:49 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: Direct request failed after 2 retries
+2026-06-06 11:56:49 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
+2026-06-06 11:56:49 [PAPER_SEARCH] [INFO]  检索完成: 5 篇
+2026-06-06 12:03:24 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 12:03:24 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 12:03:24 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 12:03:24 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 12:03:24 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 12:03:24 [ROOT] [INFO]    保留天数: 30
+2026-06-06 12:03:24 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 12:03:35 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:03:38 [PAPER_SEARCH] [INFO]  论文检索: 'audio deepfake detection wav2vec', limit=5, source=all
+2026-06-06 12:03:39 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+wav2vec&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
+2026-06-06 12:03:48 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:03:48 [PAPER_SEARCH] [INFO]  检索完成: 5 篇 (候选=20, 去重=17)

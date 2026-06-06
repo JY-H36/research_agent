@@ -414,7 +414,6 @@ def render_chat():
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
-            # 如果该消息附带了论文检索结果，渲染卡片
             for p in msg.get("papers", []):
                 _render_paper_card(p)
 
@@ -449,12 +448,8 @@ def render_chat():
 
             if response_text:
                 st.markdown(response_text)
-            elif papers:
-                st.markdown(f"已检索到 {len(papers)} 篇论文，详情见下方卡片：")
-            elif not tool_calls:
-                st.markdown("抱歉，处理请求时遇到问题，请重试。")
 
-            # 论文卡片（联网检索结果）
+            # 论文卡片
             if papers:
                 st.divider()
                 st.markdown(f"### 📄 检索到的论文 ({len(papers)} 篇)")
@@ -484,7 +479,6 @@ def render_chat():
             "role": "assistant",
             "content": response_text,
             "papers": papers,
-            "chunks": retrieved_chunks,
         })
 
         if st.session_state.agent:
@@ -493,6 +487,9 @@ def render_chat():
         st.rerun()
 
 
+# ============================================================
+# 主入口
+# ============================================================
 def _render_paper_card(paper: dict):
     """渲染单篇论文的资料卡片"""
     title = paper.get("title", "Unknown Title")
@@ -507,9 +504,8 @@ def _render_paper_card(paper: dict):
     pdf_url = paper.get("pdf_url", "")
     paper_url = paper.get("url", "")
     arxiv_id = paper.get("arxiv_id", "")
-
-    # 标题行（带 source 标签）
     source_label = paper.get("source", "")
+
     expander_title = f"**{title}**"
     if year:
         expander_title += f" ({year})"
@@ -519,15 +515,13 @@ def _render_paper_card(paper: dict):
         expander_title += f" `{source_label}`"
 
     with st.expander(expander_title, expanded=False):
-        # 基本信息
         st.caption(f"👤 {authors}")
         if citations:
             st.caption(f"📊 引用量: {citations}")
 
-        # 链接
         links = []
         if paper_url:
-            links.append(f"[Semantic Scholar]({paper_url})")
+            links.append(f"[链接]({paper_url})")
         if arxiv_id:
             links.append(f"[arXiv:{arxiv_id}](https://arxiv.org/abs/{arxiv_id})")
         if pdf_url:
@@ -535,42 +529,33 @@ def _render_paper_card(paper: dict):
         if links:
             st.caption(" | ".join(links))
 
-        # 英文摘要
         if abstract:
             with st.container():
                 st.caption("📝 摘要 (EN)")
                 st.markdown(f"> {abstract[:800]}{'...' if len(abstract) > 800 else ''}")
 
-        # 中文摘要
         if abstract_cn:
             with st.container():
                 st.caption("📝 摘要 (CN)")
                 st.markdown(f"> {abstract_cn[:800]}")
 
-        # 下载按钮
         if pdf_url:
-            col_dl, _ = st.columns([1, 3])
-            with col_dl:
-                dl_key = f"dl_{paper.get('arxiv_id', '') or paper.get('paper_id', '') or hash(title)}"
-                if st.button("⬇ 下载 PDF 并加入知识库", key=dl_key, use_container_width=True):
-                    _download_and_ingest_paper(paper)
+            st.session_state.setdefault("_dl_btn_counter", 0)
+            st.session_state["_dl_btn_counter"] += 1
+            dl_key = f"dl_{st.session_state['_dl_btn_counter']}"
+            if st.button("⬇ 下载 PDF 并加入知识库", key=dl_key, use_container_width=True):
+                _download_and_ingest_paper(paper)
 
 
-# ============================================================
-# 主入口
-# ============================================================
 def _download_and_ingest_paper(paper: dict):
     """下载论文 PDF 并加入知识库"""
     pdf_url = paper.get("pdf_url", "")
     title = paper.get("title", "unknown")[:80].replace("/", "_").replace(":", "_")
-
     if not pdf_url:
         st.error("该论文无可下载的 PDF 链接")
         return
 
-    # 进度提示
     status_placeholder = st.empty()
-
     try:
         from knowledge_base.paper_search import download_paper_pdf
         from utils.helpers import compute_md5_from_file
@@ -578,71 +563,52 @@ def _download_and_ingest_paper(paper: dict):
         status_placeholder.info("正在下载 PDF...")
         ensure_dir(UPLOAD_DIR)
         save_path = os.path.join(UPLOAD_DIR, f"_download_{title}.pdf")
-        success = download_paper_pdf(pdf_url, save_path)
-
-        if not success:
-            status_placeholder.error("PDF 下载失败，请检查网络或手动下载")
+        if not download_paper_pdf(pdf_url, save_path):
+            status_placeholder.error("PDF 下载失败")
             return
 
-        # 检查 MD5 是否已存在
         file_md5 = compute_md5_from_file(save_path)
         db = SessionLocal()
         existing = db.query(Document).filter(Document.md5_hash == file_md5).first()
         db.close()
-
         if existing:
             os.remove(save_path)
             status_placeholder.warning(f"该论文已在知识库中（{existing.filename}）")
             return
 
-        # 走正常的文档处理流程
         status_placeholder.info("正在 Docling 解析 + 向量化...")
-        file_md5_check, chunks = process_document(save_path)
-
+        _, chunks = process_document(save_path)
         if not chunks:
             os.remove(save_path)
             status_placeholder.error("文档解析失败")
             return
 
-        # 存入 MySQL
         db = SessionLocal()
         try:
-            doc = Document(
-                filename=f"{title}.pdf", md5_hash=file_md5,
-                file_path=save_path, file_size=os.path.getsize(save_path),
-                chunk_count=len(chunks),
-            )
+            doc = Document(filename=f"{title}.pdf", md5_hash=file_md5,
+                           file_path=save_path, file_size=os.path.getsize(save_path),
+                           chunk_count=len(chunks))
             db.add(doc)
             db.flush()
-
             for i, chunk in enumerate(chunks):
                 level_prefix = f"[h{chunk.get('level', 2)}]"
                 full_section = f"{level_prefix} {chunk.get('section_name', '')}".strip()[:500]
-                chunk_obj = Chunk(
-                    document_id=doc.id, chunk_index=i,
-                    section_name=full_section, content=chunk["content"],
-                )
-                db.add(chunk_obj)
+                db.add(Chunk(document_id=doc.id, chunk_index=i,
+                             section_name=full_section, content=chunk["content"]))
             db.commit()
         finally:
             db.close()
 
-        # Chroma + 重建索引
         chunk_texts = [c["content"] for c in chunks]
         embeddings = embed_texts(chunk_texts)
         chunk_ids = [f"doc{doc.id}_chunk{c['chunk_index']}" for c in chunks]
-        metadatas = [
-            {"document_id": doc.id, "section_name": c.get("section_name", ""),
-             "level": c.get("level", 2), "chunk_index": c["chunk_index"],
-             "filename": f"{title}.pdf"}
-            for c in chunks
-        ]
+        metadatas = [{"document_id": doc.id, "section_name": c.get("section_name", ""),
+                       "level": c.get("level", 2), "chunk_index": c["chunk_index"],
+                       "filename": f"{title}.pdf"} for c in chunks]
         add_chunks(chunk_ids, chunk_texts, embeddings, metadatas)
         rebuild_retriever()
-
         st.session_state.kb_stats = get_kb_stats()
         status_placeholder.success(f"✅ 论文已加入知识库：「{title}」({len(chunks)} 个片段)")
-
     except Exception as e:
         status_placeholder.error(f"下载/入库失败: {str(e)}")
         logger.error("论文下载入库异常: %s", e, exc_info=True)
