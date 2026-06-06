@@ -318,6 +318,9 @@ def render_sidebar():
         # ---- 会话管理 ----
         st.header("💬 会话管理")
 
+        # 始终从 DB 查询会话列表（不依赖 agent 是否已初始化）
+        sessions = _list_sessions_from_db()
+
         if st.button("➕ 新建会话", use_container_width=True, key="new_session_btn"):
             new_id = _create_new_session()
             st.session_state.current_session_id = new_id
@@ -325,24 +328,18 @@ def render_sidebar():
             st.session_state.tool_logs = []
             st.rerun()
 
-        if st.session_state.agent:
-            sessions = st.session_state.agent.get_session_list()
-            for s in sessions:
-                col_title, col_del = st.columns([4, 1])
-                with col_title:
-                    is_active = s["id"] == st.session_state.current_session_id
-                    label = f"{'🔵 ' if is_active else ''}{s['title']} ({s['message_count']}条)"
-                    if st.button(label, key=f"session_{s['id']}", use_container_width=True):
-                        _switch_to_session(s["id"])
-                        st.rerun()
-                with col_del:
-                    if st.button("🗑️", key=f"del_{s['id']}", help="删除会话"):
-                        if st.session_state.agent:
-                            st.session_state.agent.delete_session(s["id"])
-                        if s["id"] == st.session_state.current_session_id:
-                            st.session_state.current_session_id = None
-                            st.session_state.messages = []
-                        st.rerun()
+        for s in sessions:
+            col_title, col_del = st.columns([4, 1])
+            with col_title:
+                is_active = s["id"] == st.session_state.current_session_id
+                label = f"{'🔵 ' if is_active else ''}{s['title']} ({s['message_count']}条)"
+                if st.button(label, key=f"session_{s['id']}", use_container_width=True):
+                    _switch_to_session(s["id"])
+                    st.rerun()
+            with col_del:
+                if st.button("🗑️", key=f"del_{s['id']}", help="删除会话"):
+                    _delete_session(s["id"])
+                    st.rerun()
 
         st.divider()
 
@@ -362,6 +359,37 @@ def render_sidebar():
 
         # ---- 系统日志 ----
         render_log_panel()
+
+
+def _list_sessions_from_db() -> list:
+    """直接从 DB 查询会话列表，不依赖 agent"""
+    from database.connection import SessionLocal
+    from database.models import Session
+    from sqlalchemy import desc
+    db = SessionLocal()
+    try:
+        sessions = db.query(Session).order_by(desc(Session.updated_at)).all()
+        return [{"id": s.id, "title": s.title, "message_count": len(s.messages),
+                 "created_at": s.created_at, "updated_at": s.updated_at} for s in sessions]
+    finally:
+        db.close()
+
+
+def _delete_session(session_id: int):
+    """删除会话"""
+    from database.connection import SessionLocal
+    from database.models import Session as DBSession
+    db = SessionLocal()
+    try:
+        s = db.query(DBSession).filter(DBSession.id == session_id).first()
+        if s:
+            db.delete(s)
+            db.commit()
+    finally:
+        db.close()
+    if session_id == st.session_state.current_session_id:
+        st.session_state.current_session_id = None
+        st.session_state.messages = []
 
 
 def _create_new_session() -> int:
@@ -438,6 +466,7 @@ def render_chat():
                         "response": f"抱歉，处理请求时出错: {str(e)}",
                         "tool_calls": [],
                         "retrieved_chunks": [],
+                        "papers": [],
                         "middleware_logs": [],
                     }
 

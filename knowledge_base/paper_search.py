@@ -1,8 +1,8 @@
 """
-论文联网检索模块（基于 MCP Server JS 逻辑重写）
-- 每个源双路径尝试：直连优先 → 代理兜底
-- arXiv / Semantic Scholar / OpenAlex 三源并行
-- 年份过滤 + 去重排序 + LLM 摘要翻译
+论文联网检索模块
+- arXiv: 直连 + 显式代理双路径（主力源）
+- OpenAlex: 显式代理（主力源，无速率限制）
+- Semantic Scholar: 带冷却计时，避免连续 429
 """
 import time
 import re
@@ -13,7 +13,7 @@ import urllib.parse
 import urllib.error
 import feedparser
 import concurrent.futures
-from typing import List, Dict, Callable
+from typing import List, Dict
 from datetime import datetime
 
 from config import RETRIEVAL_TOP_K
@@ -25,26 +25,43 @@ logger = get_logger(__name__)
 # 配置
 # ============================================================
 REQUEST_TIMEOUT = 10
-MAX_RETRIES = 2
 DEFAULT_LIMIT = 10
 HEADERS = {"User-Agent": "ResearchAgent/1.0 (mailto:research@example.com)"}
 
-# Semantic Scholar API Key（可选，提升速率限制）
-S2_API_KEY = None  # 可通过环境变量 SEMANTIC_SCHOLAR_API_KEY 设置
+# Clash Verge 代理地址
+PROXY_URL = "http://127.0.0.1:7897"
+PROXIES = {"http": PROXY_URL, "https": PROXY_URL}
+
+# Semantic Scholar 冷却时间（秒）
+S2_COOLDOWN_SECONDS = 120
+_s2_last_request_time: float = 0.0
 
 
+def _s2_is_cooled_down() -> bool:
+    """检查 S2 是否已冷却"""
+    return (time.time() - _s2_last_request_time) >= S2_COOLDOWN_SECONDS
+
+
+def _s2_mark_request():
+    """记录 S2 请求时间"""
+    global _s2_last_request_time
+    _s2_last_request_time = time.time()
+
+
+# ============================================================
+# 双路径 HTTP 请求（直连 / 显式代理）
+# ============================================================
 def _try_fetch(url: str, accept: str = None, timeout: int = REQUEST_TIMEOUT) -> str:
     """
-    双路径尝试获取 URL 内容：
-    Path A: urllib 直连（绕过系统代理）
-    Path B: requests 走系统代理
-    哪个先成功用哪个
+    Path A: urllib 直连（绕过代理）
+    Path B: requests + 显式代理 http://127.0.0.1:7897
+    两个路径并行，哪个先成功用哪个
     """
     req_headers = dict(HEADERS)
     if accept:
         req_headers["Accept"] = accept
 
-    results = {}
+    errors = {}
 
     def try_direct():
         try:
@@ -53,57 +70,51 @@ def _try_fetch(url: str, accept: str = None, timeout: int = REQUEST_TIMEOUT) -> 
             with opener.open(r, timeout=timeout) as resp:
                 return resp.read().decode("utf-8")
         except Exception as e:
-            results["direct"] = str(e)
+            errors["direct"] = str(e)[:120]
             return None
 
     def try_proxy():
         try:
-            r = requests.get(url, headers=req_headers, timeout=timeout)
+            r = requests.get(url, headers=req_headers, timeout=timeout, proxies=PROXIES)
             r.raise_for_status()
             return r.text
         except Exception as e:
-            results["proxy"] = str(e)
+            errors["proxy"] = str(e)[:120]
             return None
 
-    # 并行双路径
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        future_direct = executor.submit(try_direct)
-        future_proxy = executor.submit(try_proxy)
+        f_direct = executor.submit(try_direct)
+        f_proxy = executor.submit(try_proxy)
 
-        # 等待第一个成功的
-        done, _ = concurrent.futures.wait(
-            [future_direct, future_proxy],
-            return_when=concurrent.futures.FIRST_COMPLETED,
-            timeout=timeout + 5,
-        )
+        # 等第一个成功的
+        concurrent.futures.wait([f_direct, f_proxy],
+                               return_when=concurrent.futures.FIRST_COMPLETED,
+                               timeout=timeout + 5)
 
-        for future in done:
+        for f in [f_direct, f_proxy]:
+            if f.done():
+                try:
+                    result = f.result()
+                    if result is not None:
+                        return result
+                except Exception:
+                    pass
+
+        for f in [f for f in [f_direct, f_proxy] if not f.done()]:
             try:
-                result = future.result()
+                result = f.result(timeout=5)
                 if result is not None:
                     return result
             except Exception:
                 pass
 
-        # 都没完成，等剩余的超时
-        remaining = [f for f in [future_direct, future_proxy] if not f.done()]
-        for future in remaining:
-            try:
-                result = future.result(timeout=5)
-                if result is not None:
-                    return result
-            except Exception:
-                pass
-
-    # 都失败了
-    raise RuntimeError(f"双路径均失败: direct={results.get('direct')}, proxy={results.get('proxy')}")
+    raise RuntimeError(f"双路径均失败: {errors}")
 
 
 # ============================================================
 # arXiv
 # ============================================================
 def search_arxiv(query: str, limit: int = DEFAULT_LIMIT) -> List[Dict]:
-    """arXiv API — 与 JS 版逻辑一致"""
     params = {
         "search_query": f"all:{query}", "start": 0,
         "max_results": str(limit), "sortBy": "relevance", "sortOrder": "descending",
@@ -124,7 +135,7 @@ def search_arxiv(query: str, limit: int = DEFAULT_LIMIT) -> List[Dict]:
                 "year": int(published[:4]) if published else None,
                 "venue": "arXiv", "url": entry.get("id", ""),
                 "pdf_url": f"https://arxiv.org/pdf/{arxiv_id}.pdf",
-                "citation_count": None,
+                "citation_count": 0,
             })
         logger.debug("arXiv: %d 篇", len(papers))
         return papers
@@ -134,10 +145,15 @@ def search_arxiv(query: str, limit: int = DEFAULT_LIMIT) -> List[Dict]:
 
 
 # ============================================================
-# Semantic Scholar
+# Semantic Scholar（带冷却控制）
 # ============================================================
 def search_semantic_scholar(query: str, limit: int = DEFAULT_LIMIT) -> List[Dict]:
-    """Semantic Scholar API — 与 JS 版逻辑一致"""
+    if not _s2_is_cooled_down():
+        remaining = int(S2_COOLDOWN_SECONDS - (time.time() - _s2_last_request_time))
+        logger.info("S2 冷却中 (还需 %ds)，跳过本次检索", remaining)
+        return []
+
+    _s2_mark_request()
     params = {
         "query": query, "limit": str(limit),
         "fields": "paperId,title,abstract,year,venue,authors,url,citationCount,referenceCount,openAccessPdf",
@@ -161,7 +177,12 @@ def search_semantic_scholar(query: str, limit: int = DEFAULT_LIMIT) -> List[Dict
         logger.debug("Semantic Scholar: %d 篇", len(papers))
         return papers
     except Exception as e:
-        logger.warning("Semantic Scholar 检索失败: %s", e)
+        # 被限速时重置冷却
+        if "429" in str(e):
+            _s2_mark_request()
+            logger.warning("S2 429，冷却 %ds", S2_COOLDOWN_SECONDS)
+        else:
+            logger.warning("Semantic Scholar 检索失败: %s", e)
         return []
 
 
@@ -169,7 +190,6 @@ def search_semantic_scholar(query: str, limit: int = DEFAULT_LIMIT) -> List[Dict
 # OpenAlex
 # ============================================================
 def search_openalex(query: str, limit: int = DEFAULT_LIMIT) -> List[Dict]:
-    """OpenAlex API — 与 JS 版逻辑一致"""
     params = {
         "search": query, "per-page": str(min(limit, 200)),
         "select": "id,display_name,publication_year,abstract_inverted_index,authorships,primary_location,cited_by_count,open_access",
@@ -217,14 +237,12 @@ def _recover_oa_abstract(inverted_index) -> str:
 
 
 # ============================================================
-# 合并检索（与 JS 版 search_literature 逻辑一致）
+# 合并检索（arXiv + OpenAlex 主力，S2 冷却后补充）
 # ============================================================
 def search_papers(query: str, limit: int = DEFAULT_LIMIT, source: str = "all",
                   since_year: int = None) -> List[Dict]:
-    """三源并行检索 + 年份过滤 + 去重排序"""
     logger.info("论文检索: '%s', limit=%d, source=%s", query[:120], limit, source)
 
-    # 扩大检索量（与 JS 版 expandedLimit 一致）
     expanded_limit = min(50, max(limit * 4, limit))
 
     # 年份范围
@@ -235,22 +253,22 @@ def search_papers(query: str, limit: int = DEFAULT_LIMIT, source: str = "all",
     if len(years_in_query) >= 2:
         min_year, max_year = min(years_in_query), max(years_in_query)
 
-    # 选择数据源（与 JS 版顺序一致：openalex, arxiv, semantic_scholar）
+    # 数据源：arxiv + openalex 主力，S2 冷却后加入
     sources: List[tuple] = []
     if source == "all":
-        sources = [
-            ("openalex", lambda: search_openalex(query, expanded_limit)),
-            ("arxiv", lambda: search_arxiv(query, expanded_limit)),
-            ("semantic_scholar", lambda: search_semantic_scholar(query, expanded_limit)),
-        ]
+        sources = [("arxiv", lambda: search_arxiv(query, expanded_limit)),
+                    ("openalex", lambda: search_openalex(query, expanded_limit))]
+        if _s2_is_cooled_down():
+            sources.append(("semantic_scholar", lambda: search_semantic_scholar(query, expanded_limit)))
+        else:
+            logger.info("S2 冷却中，跳过")
     else:
         m = {"arxiv": search_arxiv, "semantic_scholar": search_semantic_scholar, "openalex": search_openalex}
         if source in m:
             sources = [(source, lambda: m[source](query, expanded_limit))]
 
-    # 并行检索（与 JS 版 Promise.all + safeFetch 等效）
+    # 并行检索
     all_rows = []
-    warnings = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         futures = {executor.submit(runner): name for name, runner in sources}
         for future in concurrent.futures.as_completed(futures):
@@ -260,14 +278,13 @@ def search_papers(query: str, limit: int = DEFAULT_LIMIT, source: str = "all",
                 all_rows.extend(rows)
                 logger.debug("  %s: %d 篇", name, len(rows))
             except Exception as e:
-                warnings.append({"source": name, "error": str(e)})
                 logger.warning("  %s 失败: %s", name, e)
 
     # 年份过滤
     filtered = [p for p in all_rows if p.get("title") and (
         p.get("year") is None or (p["year"] >= min_year and (max_year is None or p["year"] <= max_year)))]
 
-    # 去重
+    # 去重 + 信息合并
     seen = {}
     for p in filtered:
         key = p.get("paper_id") or p.get("title", "")[:100].lower()
@@ -280,7 +297,7 @@ def search_papers(query: str, limit: int = DEFAULT_LIMIT, source: str = "all",
                     e[fld] = p[fld]
 
     papers = sorted(seen.values(), key=lambda x: x.get("citation_count") or 0, reverse=True)[:limit]
-    logger.info("检索完成: %d 篇 (候选=%d, 去重=%d)", len(papers), len(all_rows), len(seen))
+    logger.info("检索完成: %d 篇", len(papers))
     return papers
 
 
@@ -320,7 +337,7 @@ def download_paper_pdf(pdf_url: str, save_path: str) -> bool:
     if not pdf_url:
         return False
     try:
-        r = requests.get(pdf_url, headers=HEADERS, timeout=30, stream=True)
+        r = requests.get(pdf_url, headers=HEADERS, timeout=30, stream=True, proxies=PROXIES)
         r.raise_for_status()
         with open(save_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):

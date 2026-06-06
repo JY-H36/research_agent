@@ -60,8 +60,8 @@ TOOL_DEFINITIONS = [
                     },
                     "limit": {
                         "type": "integer",
-                        "description": f"期望返回的论文篇数，默认 {RETRIEVAL_TOP_K * 2} 篇",
-                        "default": RETRIEVAL_TOP_K * 2,
+                        "description": "返回论文篇数。务必根据用户明确指定的数量设置，如用户说'5篇'则设为5。用户未指定时默认5篇",
+                        "default": 5,
                     },
                     "source": {
                         "type": "string",
@@ -183,7 +183,7 @@ def _format_search_results(chunks: List[Dict], query_variants: List[str] = None)
 def _search_papers_online(args: Dict) -> Dict:
     """执行联网论文检索（三源并行 + 年份过滤）"""
     query = args.get("query", "")
-    limit = args.get("limit", RETRIEVAL_TOP_K * 2)
+    limit = args.get("limit", 5)  # 默认5篇，与工具定义一致
     source = args.get("source", "all")
     since_year = args.get("since_year")
 

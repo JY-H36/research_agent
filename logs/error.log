@@ -30,3 +30,5 @@ ModuleNotFoundError: No module named 'knowledge_base.paper_search'
 2026-06-06 12:10:05 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
 2026-06-06 12:13:23 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+survey&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
 2026-06-06 12:13:34 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 13:05:41 [PAPER_SEARCH] [WARNING]  S2 429，冷却 120s
+2026-06-06 13:08:10 [PAPER_SEARCH] [WARNING]  S2 429，冷却 120s

@@ -210,3 +210,169 @@ ModuleNotFoundError: No module named 'knowledge_base.paper_search'
 2026-06-06 12:03:39 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+wav2vec&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
 2026-06-06 12:03:48 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
 2026-06-06 12:03:48 [PAPER_SEARCH] [INFO]  检索完成: 5 篇 (候选=20, 去重=17)
+2026-06-06 12:08:18 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 12:08:18 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 12:08:18 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 12:08:18 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 12:08:18 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 12:08:18 [ROOT] [INFO]    保留天数: 30
+2026-06-06 12:08:18 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 12:08:18 [__MAIN__] [INFO]  系统初始化完成: DB 就绪, 日志系统就绪
+2026-06-06 12:08:29 [SESSION] [INFO]  会话创建: id=14, title='新会话'
+2026-06-06 12:08:29 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 14)
+2026-06-06 12:08:30 [AGENT] [INFO]  切换会话: 14 → 10
+2026-06-06 12:08:45 [AGENT] [INFO] [req_20260606_120845_b3b327] ═══ 新请求开始 ═══
+2026-06-06 12:08:47 [HTTPX] [INFO] [req_20260606_120845_b3b327] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:08:47 [LLM] [INFO] [req_20260606_120845_b3b327] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 2.3s
+2026-06-06 12:08:47 [AGENT] [INFO] [req_20260606_120845_b3b327] LLM 决定调用 1 个工具
+2026-06-06 12:08:47 [MIDDLEWARE] [INFO] [req_20260606_120845_b3b327] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'text steganography survey', 'limit': 5}
+2026-06-06 12:08:47 [PAPER_SEARCH] [INFO] [req_20260606_120845_b3b327] 论文检索: 'text steganography survey', limit=5, source=all
+2026-06-06 12:08:48 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=text+steganography+survey&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
+2026-06-06 12:08:58 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:08:58 [PAPER_SEARCH] [INFO] [req_20260606_120845_b3b327] 检索完成: 2 篇 (候选=20, 去重=2)
+2026-06-06 12:09:10 [HTTPX] [INFO] [req_20260606_120845_b3b327] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:09:10 [LLM] [INFO] [req_20260606_120845_b3b327] LLM 响应: finish=stop, content_len=874, tool_calls=0, 耗时 12.8s
+2026-06-06 12:09:10 [MIDDLEWARE] [INFO] [req_20260606_120845_b3b327] ✅ 工具调用完成: search_papers_online | 耗时 23.21s | 检索到 2 篇论文
+2026-06-06 12:09:11 [HTTPX] [INFO] [req_20260606_120845_b3b327] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:09:11 [LLM] [INFO] [req_20260606_120845_b3b327] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.0s
+2026-06-06 12:09:11 [AGENT] [INFO] [req_20260606_120845_b3b327] ═══ 请求完成, 总耗时 26.6s, 回复长度 0 字符, 工具调用 1 次 ═══
+2026-06-06 12:09:53 [AGENT] [INFO] [req_20260606_120953_7e5928] ═══ 新请求开始 ═══
+2026-06-06 12:09:54 [HTTPX] [INFO] [req_20260606_120953_7e5928] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:09:54 [LLM] [INFO] [req_20260606_120953_7e5928] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.8s
+2026-06-06 12:09:54 [AGENT] [INFO] [req_20260606_120953_7e5928] LLM 决定调用 1 个工具
+2026-06-06 12:09:54 [MIDDLEWARE] [INFO] [req_20260606_120953_7e5928] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'text steganography survey', 'limit': 5}
+2026-06-06 12:09:54 [PAPER_SEARCH] [INFO] [req_20260606_120953_7e5928] 论文检索: 'text steganography survey', limit=5, source=all
+2026-06-06 12:10:05 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:10:05 [PAPER_SEARCH] [INFO] [req_20260606_120953_7e5928] 检索完成: 5 篇 (候选=40, 去重=9)
+2026-06-06 12:10:37 [HTTPX] [INFO] [req_20260606_120953_7e5928] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:10:37 [LLM] [INFO] [req_20260606_120953_7e5928] LLM 响应: finish=stop, content_len=2135, tool_calls=0, 耗时 32.0s
+2026-06-06 12:10:37 [MIDDLEWARE] [INFO] [req_20260606_120953_7e5928] ✅ 工具调用完成: search_papers_online | 耗时 42.35s | 检索到 5 篇论文
+2026-06-06 12:10:38 [HTTPX] [INFO] [req_20260606_120953_7e5928] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:10:38 [LLM] [INFO] [req_20260606_120953_7e5928] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.0s
+2026-06-06 12:10:38 [AGENT] [INFO] [req_20260606_120953_7e5928] ═══ 请求完成, 总耗时 45.2s, 回复长度 0 字符, 工具调用 1 次 ═══
+2026-06-06 12:13:21 [AGENT] [INFO] [req_20260606_121321_a59a7c] ═══ 新请求开始 ═══
+2026-06-06 12:13:23 [HTTPX] [INFO] [req_20260606_121321_a59a7c] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:13:23 [LLM] [INFO] [req_20260606_121321_a59a7c] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 2.0s
+2026-06-06 12:13:23 [AGENT] [INFO] [req_20260606_121321_a59a7c] LLM 决定调用 1 个工具
+2026-06-06 12:13:23 [MIDDLEWARE] [INFO] [req_20260606_121321_a59a7c] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'audio deepfake detection survey', 'limit': 5}
+2026-06-06 12:13:23 [PAPER_SEARCH] [INFO] [req_20260606_121321_a59a7c] 论文检索: 'audio deepfake detection survey', limit=5, source=all
+2026-06-06 12:13:23 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+survey&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
+2026-06-06 12:13:34 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
+2026-06-06 12:13:34 [PAPER_SEARCH] [INFO] [req_20260606_121321_a59a7c] 检索完成: 5 篇 (候选=20, 去重=17)
+2026-06-06 12:14:12 [HTTPX] [INFO] [req_20260606_121321_a59a7c] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:14:12 [LLM] [INFO] [req_20260606_121321_a59a7c] LLM 响应: finish=stop, content_len=2533, tool_calls=0, 耗时 38.3s
+2026-06-06 12:14:12 [MIDDLEWARE] [INFO] [req_20260606_121321_a59a7c] ✅ 工具调用完成: search_papers_online | 耗时 49.47s | 检索到 5 篇论文
+2026-06-06 12:14:13 [HTTPX] [INFO] [req_20260606_121321_a59a7c] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 12:14:13 [LLM] [INFO] [req_20260606_121321_a59a7c] LLM 响应: finish=tool_calls, content_len=0, tool_calls=1, 耗时 1.1s
+2026-06-06 12:14:13 [AGENT] [INFO] [req_20260606_121321_a59a7c] ═══ 请求完成, 总耗时 52.6s, 回复长度 0 字符, 工具调用 1 次 ═══
+2026-06-06 13:05:23 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 13:05:23 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 13:05:23 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 13:05:23 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 13:05:23 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 13:05:23 [ROOT] [INFO]    保留天数: 30
+2026-06-06 13:05:23 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 13:05:39 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 13:05:39 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 13:05:39 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 13:05:39 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 13:05:39 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 13:05:39 [ROOT] [INFO]    保留天数: 30
+2026-06-06 13:05:39 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 13:05:41 [PAPER_SEARCH] [WARNING]  S2 429，冷却 120s
+2026-06-06 13:05:42 [PAPER_SEARCH] [INFO]  论文检索: 'audio deepfake detection wav2vec', limit=5, source=all
+2026-06-06 13:05:42 [PAPER_SEARCH] [INFO]  S2 冷却中，跳过
+2026-06-06 13:05:44 [PAPER_SEARCH] [INFO]  检索完成: 5 篇
+2026-06-06 13:07:55 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 13:07:55 [ROOT] [INFO]  日志系统初始化完成
+2026-06-06 13:07:55 [ROOT] [INFO]    日志目录: F:\科研助手agent\logs
+2026-06-06 13:07:55 [ROOT] [INFO]    控制台级别: DEBUG
+2026-06-06 13:07:55 [ROOT] [INFO]    文件级别: INFO
+2026-06-06 13:07:55 [ROOT] [INFO]    保留天数: 30
+2026-06-06 13:07:55 [ROOT] [INFO]  ══════════════════════════════════════
+2026-06-06 13:07:55 [__MAIN__] [INFO]  系统初始化完成: DB 就绪, 日志系统就绪
+2026-06-06 13:07:58 [SESSION] [INFO]  会话创建: id=15, title='新会话'
+2026-06-06 13:07:58 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 15)
+2026-06-06 13:07:59 [AGENT] [INFO]  切换会话: 15 → 10
+2026-06-06 13:08:05 [AGENT] [INFO] [req_20260606_130805_a089e4] ═══ 新请求开始 ═══
+2026-06-06 13:08:09 [HTTPX] [INFO] [req_20260606_130805_a089e4] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:08:09 [LLM] [INFO] [req_20260606_130805_a089e4] LLM 响应: finish=tool_calls, content_len=0, tool_calls=2, 耗时 3.1s
+2026-06-06 13:08:09 [AGENT] [INFO] [req_20260606_130805_a089e4] LLM 决定调用 2 个工具
+2026-06-06 13:08:09 [MIDDLEWARE] [INFO] [req_20260606_130805_a089e4] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'audio deepfake detection survey', 'limit': 5}
+2026-06-06 13:08:09 [PAPER_SEARCH] [INFO] [req_20260606_130805_a089e4] 论文检索: 'audio deepfake detection survey', limit=5, source=all
+2026-06-06 13:08:10 [PAPER_SEARCH] [WARNING]  S2 429，冷却 120s
+2026-06-06 13:08:11 [PAPER_SEARCH] [INFO] [req_20260606_130805_a089e4] 检索完成: 5 篇
+2026-06-06 13:08:47 [HTTPX] [INFO] [req_20260606_130805_a089e4] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:08:47 [LLM] [INFO] [req_20260606_130805_a089e4] LLM 响应: finish=stop, content_len=2524, tool_calls=0, 耗时 35.8s
+2026-06-06 13:08:47 [MIDDLEWARE] [INFO] [req_20260606_130805_a089e4] ✅ 工具调用完成: search_papers_online | 耗时 38.28s | 检索到 5 篇论文
+2026-06-06 13:08:47 [MIDDLEWARE] [INFO] [req_20260606_130805_a089e4] 🔧 工具调用开始: search_papers_online | 参数: {'query': 'fake audio detection', 'limit': 5}
+2026-06-06 13:08:47 [PAPER_SEARCH] [INFO] [req_20260606_130805_a089e4] 论文检索: 'fake audio detection', limit=5, source=all
+2026-06-06 13:08:47 [PAPER_SEARCH] [INFO] [req_20260606_130805_a089e4] S2 冷却中，跳过
+2026-06-06 13:08:49 [PAPER_SEARCH] [INFO] [req_20260606_130805_a089e4] 检索完成: 5 篇
+2026-06-06 13:08:58 [HTTPX] [INFO] [req_20260606_130805_a089e4] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:08:58 [LLM] [INFO] [req_20260606_130805_a089e4] LLM 响应: finish=stop, content_len=660, tool_calls=0, 耗时 9.7s
+2026-06-06 13:08:58 [MIDDLEWARE] [INFO] [req_20260606_130805_a089e4] ✅ 工具调用完成: search_papers_online | 耗时 11.59s | 检索到 5 篇论文
+2026-06-06 13:09:02 [HTTPX] [INFO] [req_20260606_130805_a089e4] HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:09:02 [LLM] [INFO] [req_20260606_130805_a089e4] LLM 响应: finish=tool_calls, content_len=0, tool_calls=2, 耗时 3.2s
+2026-06-06 13:09:02 [AGENT] [INFO] [req_20260606_130805_a089e4] ═══ 请求完成, 总耗时 56.1s, 回复长度 0 字符, 工具调用 2 次 ═══
+2026-06-06 13:16:19 [SESSION] [INFO]  会话创建: id=16, title='新会话'
+2026-06-06 13:16:19 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 16)
+2026-06-06 13:16:21 [AGENT] [INFO]  切换会话: 16 → 10
+2026-06-06 13:16:30 [AGENT] [INFO]  ═══ 新请求开始 ═══
+2026-06-06 13:16:32 [HTTPX] [INFO]  HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:16:32 [LLM] [INFO]  LLM 响应: finish=tool_calls, content_len=0, tool_calls=2, 耗时 1.8s
+2026-06-06 13:16:32 [AGENT] [INFO]  LLM 决定调用 2 个工具
+2026-06-06 13:16:32 [MIDDLEWARE] [INFO]  🔧 工具调用开始: search_papers_online | 参数: {'query': 'fake audio detection survey', 'limit': 5}
+2026-06-06 13:16:32 [PAPER_SEARCH] [INFO]  论文检索: 'fake audio detection survey', limit=5, source=all
+2026-06-06 13:16:35 [PAPER_SEARCH] [INFO]  检索完成: 5 篇
+2026-06-06 13:16:59 [HTTPX] [INFO]  HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:16:59 [LLM] [INFO]  LLM 响应: finish=stop, content_len=1942, tool_calls=0, 耗时 24.7s
+2026-06-06 13:16:59 [MIDDLEWARE] [INFO]  ✅ 工具调用完成: search_papers_online | 耗时 27.76s | 检索到 5 篇论文
+2026-06-06 13:16:59 [MIDDLEWARE] [INFO]  🔧 工具调用开始: search_papers_online | 参数: {'query': 'deepfake audio detection', 'limit': 5}
+2026-06-06 13:16:59 [PAPER_SEARCH] [INFO]  论文检索: 'deepfake audio detection', limit=5, source=all
+2026-06-06 13:16:59 [PAPER_SEARCH] [INFO]  S2 冷却中，跳过
+2026-06-06 13:17:01 [PAPER_SEARCH] [INFO]  检索完成: 5 篇
+2026-06-06 13:17:29 [HTTPX] [INFO]  HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:17:29 [LLM] [INFO]  LLM 响应: finish=stop, content_len=2243, tool_calls=0, 耗时 27.9s
+2026-06-06 13:17:29 [MIDDLEWARE] [INFO]  ✅ 工具调用完成: search_papers_online | 耗时 29.64s | 检索到 5 篇论文
+2026-06-06 13:17:57 [HTTPX] [INFO]  HTTP Request: POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-06 13:17:57 [LLM] [INFO]  LLM 响应: finish=stop, content_len=2088, tool_calls=0, 耗时 28.4s
+2026-06-06 13:17:57 [AGENT] [INFO]  ═══ 请求完成, 总耗时 87.7s, 回复长度 2088 字符, 工具调用 2 次 ═══
+2026-06-06 13:19:12 [SESSION] [INFO]  会话创建: id=17, title='新会话'
+2026-06-06 13:19:12 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 17)
+2026-06-06 13:19:19 [AGENT] [INFO]  切换会话: 17 → 10
+2026-06-06 13:21:12 [SESSION] [INFO]  会话创建: id=18, title='新会话'
+2026-06-06 13:21:12 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 18)
+2026-06-06 13:21:17 [SESSION] [INFO]  会话创建: id=19, title='新会话'
+2026-06-06 13:21:17 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 19)
+2026-06-06 13:21:18 [AGENT] [INFO]  切换会话: 19 → 19
+2026-06-06 13:21:19 [AGENT] [INFO]  切换会话: 19 → 18
+2026-06-06 13:21:19 [AGENT] [INFO]  切换会话: 18 → 19
+2026-06-06 13:21:20 [SESSION] [INFO]  会话创建: id=20, title='新会话'
+2026-06-06 13:21:20 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 20)
+2026-06-06 13:21:34 [SESSION] [INFO]  会话创建: id=21, title='新会话'
+2026-06-06 13:21:34 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 21)
+2026-06-06 13:22:16 [AGENT] [INFO]  删除会话: 21
+2026-06-06 13:22:16 [SESSION] [INFO]  会话删除: id=21
+2026-06-06 13:22:17 [AGENT] [INFO]  删除会话: 20
+2026-06-06 13:22:17 [SESSION] [INFO]  会话删除: id=20
+2026-06-06 13:22:19 [AGENT] [INFO]  删除会话: 19
+2026-06-06 13:22:19 [SESSION] [INFO]  会话删除: id=19
+2026-06-06 13:22:20 [AGENT] [INFO]  删除会话: 18
+2026-06-06 13:22:20 [SESSION] [INFO]  会话删除: id=18
+2026-06-06 13:22:21 [AGENT] [INFO]  删除会话: 17
+2026-06-06 13:22:21 [SESSION] [INFO]  会话删除: id=17
+2026-06-06 13:22:22 [AGENT] [INFO]  删除会话: 16
+2026-06-06 13:22:22 [SESSION] [INFO]  会话删除: id=16
+2026-06-06 13:22:23 [AGENT] [INFO]  删除会话: 15
+2026-06-06 13:22:23 [SESSION] [INFO]  会话删除: id=15
+2026-06-06 13:22:24 [AGENT] [INFO]  删除会话: 14
+2026-06-06 13:22:24 [SESSION] [INFO]  会话删除: id=14
+2026-06-06 13:22:25 [AGENT] [INFO]  删除会话: 13
+2026-06-06 13:22:25 [SESSION] [INFO]  会话删除: id=13
+2026-06-06 13:22:26 [AGENT] [INFO]  删除会话: 12
+2026-06-06 13:22:26 [SESSION] [INFO]  会话删除: id=12
+2026-06-06 13:22:27 [AGENT] [INFO]  删除会话: 11
+2026-06-06 13:22:27 [SESSION] [INFO]  会话删除: id=11
+2026-06-06 13:27:21 [SESSION] [INFO]  会话创建: id=22, title='新会话'
+2026-06-06 13:27:21 [AGENT] [INFO]  Agent 初始化完成 (会话 ID: 22)
