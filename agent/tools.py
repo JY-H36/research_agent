@@ -130,16 +130,36 @@ def _search_knowledge_base(args: Dict) -> Dict:
                 "chunks": [],
             }
 
+        # 从 DB 获取文档文件名 → 用于引用标注
+        doc_ids = list(set(
+            r.get("metadata", {}).get("document_id")
+            for r in results if r.get("metadata", {}).get("document_id")
+        ))
+        doc_names = {}
+        if doc_ids:
+            from database.connection import SessionLocal as DBSession
+            from database.models import Document as DocModel
+            db = DBSession()
+            try:
+                docs = db.query(DocModel).filter(DocModel.id.in_(doc_ids)).all()
+                doc_names = {d.id: d.filename for d in docs}
+            finally:
+                db.close()
+
         # 格式化检索结果
         formatted_chunks = []
         for i, r in enumerate(results):
             md = r.get("metadata", {})
-            # 优先用 Cross-Encoder 分数，其次 RRF
             score = r.get("rerank_score", r.get("rrf_score", 0))
+            doc_id = md.get("document_id")
+            filename = doc_names.get(doc_id, f"文档{doc_id}")
+            # 去掉文件扩展名，只保留论文名
+            paper_name = filename.rsplit(".", 1)[0] if "." in filename else filename
             formatted_chunks.append({
                 "index": i + 1,
-                "document_id": md.get("document_id", "未知"),
-                "section": md.get("section_name", "未知章节"),
+                "document_id": doc_id,
+                "paper_name": paper_name,
+                "section": md.get("section_name", "").lstrip("[h123] "),
                 "content": r.get("content", ""),
                 "relevance_score": score,
             })
@@ -162,20 +182,19 @@ def _search_knowledge_base(args: Dict) -> Dict:
 
 
 def _format_search_results(chunks: List[Dict], query_variants: List[str] = None) -> str:
-    """将检索到的 chunks 格式化为 LLM 可读的文本"""
+    """将检索到的 chunks 格式化为 LLM 可读的文本（含论文名和章节引用信息）"""
     lines = ["以下是从知识库中检索到的相关论文片段：\n"]
 
     if query_variants and len(query_variants) > 1:
-        lines.append(f"（本次检索使用了 {len(query_variants)} 种不同的查询角度，包括：{' / '.join(query_variants[:5])}）\n")
+        lines.append(f"（本次检索使用了 {len(query_variants)} 种不同的查询角度：{' / '.join(query_variants[:5])}）\n")
 
     for c in chunks:
         lines.append(
             f"---\n"
-            f"【片段 {c['index']}】\n"
-            f"来源文档 ID: {c['document_id']}\n"
-            f"章节: {c['section']}\n"
-            f"相关度: {c['relevance_score']}\n"
-            f"内容:\n{c['content']}\n"
+            f"【论文】{c['paper_name']}\n"
+            f"【章节】{c['section']}\n"
+            f"【相关度】{c['relevance_score']}\n"
+            f"【内容】\n{c['content']}\n"
         )
     return '\n'.join(lines)
 

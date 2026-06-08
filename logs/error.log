@@ -1,34 +1,66 @@
-2026-06-06 10:34:07 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 10:40:00 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 10:47:19 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 10:50:06 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 10:55:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 10:59:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 11:31:10 [TOOL] [ERROR] [req_20260606_113107_7fc362] 联网论文检索异常: No module named 'knowledge_base.paper_search'
+2026-06-08 10:53:30 [PAPER_SEARCH] [WARNING]  S2 429，冷却 120s
+2026-06-08 12:07:08 [RERANKER] [ERROR] [req_20260608_120658_8b4bb9] 重排序失败: We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.，回退到 RRF 排序
 Traceback (most recent call last):
-  File "F:\科研助手agent\agent\tools.py", line 194, in _search_papers_online
-    from knowledge_base.paper_search import search_papers, translate_abstracts
-ModuleNotFoundError: No module named 'knowledge_base.paper_search'
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 1696, in _get_metadata_or_catch_error
+    raise FileMetadataError(
+huggingface_hub.errors.FileMetadataError: Distant resource does not seem to be on huggingface.co. It is possible that a configuration issue prevents you from downloading resources from https://huggingface.co. Please check your firewall and proxy settings and make sure your SSL certificates are updated.
 
-2026-06-06 11:31:10 [MIDDLEWARE] [ERROR] [req_20260606_113107_7fc362] ❌ 工具调用失败: search_papers_online | 耗时 0.00s | 执行失败: No module named 'knowledge_base.paper_search'
-2026-06-06 11:33:55 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 11:45:23 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
-2026-06-06 11:45:31 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 11:45:40 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 11:46:05 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
-2026-06-06 11:46:12 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 11:46:37 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=15)
-2026-06-06 11:46:40 [PAPER_SEARCH] [ERROR]  PDF 下载失败: 404 Client Error: Not Found for url: https://ieeexplore.ieee.org/ielx7/6287639/6514899/10154048.pdf
-2026-06-06 11:56:41 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: Direct request failed after 2 retries
-2026-06-06 11:56:49 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: Direct request failed after 2 retries
-2026-06-06 11:56:49 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: Request failed after 2 retries
-2026-06-06 12:03:35 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
-2026-06-06 12:03:39 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+wav2vec&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
-2026-06-06 12:03:48 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
-2026-06-06 12:08:48 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=text+steganography+survey&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
-2026-06-06 12:08:58 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
-2026-06-06 12:10:05 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
-2026-06-06 12:13:23 [PAPER_SEARCH] [WARNING]  Semantic Scholar 检索失败: 双路径均失败: direct=HTTP Error 429: , proxy=429 Client Error:  for url: https://api.semanticscholar.org/graph/v1/paper/search?query=audio+deepfake+detection+survey&limit=20&fields=paperId%2Ctitle%2Cabstract%2Cyear%2Cvenue%2Cauthors%2Curl%2CcitationCount%2CreferenceCount%2CopenAccessPdf
-2026-06-06 12:13:34 [PAPER_SEARCH] [WARNING]  arXiv 检索失败: 双路径均失败: direct=The read operation timed out, proxy=HTTPSConnectionPool(host='export.arxiv.org', port=443): Read timed out. (read timeout=10)
-2026-06-06 13:05:41 [PAPER_SEARCH] [WARNING]  S2 429，冷却 120s
-2026-06-06 13:08:10 [PAPER_SEARCH] [WARNING]  S2 429，冷却 120s
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\utils\hub.py", line 437, in cached_files
+    hf_hub_download(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\utils\_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 997, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 1148, in _hf_hub_download_to_cache_dir
+    _raise_on_head_call_error(head_call_error, force_download, local_files_only)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\huggingface_hub\file_download.py", line 1785, in _raise_on_head_call_error
+    raise LocalEntryNotFoundError(
+huggingface_hub.errors.LocalEntryNotFoundError: An error happened while trying to locate the file on the Hub and we cannot find the requested files in the local cache. Please check your connection and try again or make sure your Internet connection is on.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\科研助手agent\knowledge_base\reranker.py", line 68, in rerank
+    model = get_reranker()
+  File "F:\科研助手agent\knowledge_base\reranker.py", line 23, in get_reranker
+    _reranker = CrossEncoder(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\util\decorators.py", line 160, in wrapper
+    return func(self, *args, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\cross_encoder\model.py", line 182, in __init__
+    super().__init__(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\base\model.py", line 204, in __init__
+    modules, self.module_kwargs = self._load_modules(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\base\model.py", line 982, in _load_modules
+    return self._load_default_modules(model_name_or_path, **load_kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\sentence_transformers\cross_encoder\model.py", line 233, in _load_default_modules
+    config: PretrainedConfig = AutoConfig.from_pretrained(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\models\auto\configuration_auto.py", line 374, in from_pretrained
+    config_dict, unused_kwargs = PreTrainedConfig.get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\configuration_utils.py", line 685, in get_config_dict
+    config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\configuration_utils.py", line 740, in _get_config_dict
+    resolved_config_file = cached_file(
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\utils\hub.py", line 293, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "E:\Anaconda3\envs\agent_rag\lib\site-packages\transformers\utils\hub.py", line 513, in cached_files
+    raise OSError(
+OSError: We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.
+
+2026-06-08 12:11:43 [RERANKER] [WARNING]  Cross-Encoder 模型加载失败 (We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.)。网络不可达或模型未缓存。此后将使用 RRF 排序，不影响检索功能。如需启用重排序，请在有网络时手动运行: python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-large', max_length=512)"
+2026-06-08 12:14:03 [RERANKER] [WARNING] [req_20260608_121352_eb00c0] Cross-Encoder 模型加载失败 (We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.)。网络不可达或模型未缓存。此后将使用 RRF 排序，不影响检索功能。如需启用重排序，请在有网络时手动运行: python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-large', max_length=512)"
+2026-06-08 12:19:34 [RERANKER] [WARNING]  Cross-Encoder 模型加载失败 (We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.)。网络不可达或模型未缓存。此后将使用 RRF 排序，不影响检索功能。如需启用重排序，请在有网络时手动运行: python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-large', max_length=512)"
+2026-06-08 12:20:00 [AGENT] [WARNING]  ReAct 循环 3 轮后 LLM 未生成文本回复
+2026-06-08 12:22:30 [AGENT] [WARNING]  ReAct 循环 3 轮后 LLM 未生成文本回复
+2026-06-08 12:25:36 [RERANKER] [WARNING]  Cross-Encoder 模型加载失败 (We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.)。网络不可达或模型未缓存。此后将使用 RRF 排序，不影响检索功能。如需启用重排序，请在有网络时手动运行: python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-large', max_length=512)"
+2026-06-08 12:25:38 [AGENT] [WARNING]  ReAct 循环 3 轮后 LLM 未生成文本回复
+2026-06-08 12:31:11 [RERANKER] [WARNING]  Cross-Encoder 模型加载失败 (We couldn't connect to 'https://hf-mirror.com' to load the files, and couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.)。网络不可达或模型未缓存。此后将使用 RRF 排序，不影响检索功能。如需启用重排序，请在有网络时手动运行: python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-large', max_length=512)"

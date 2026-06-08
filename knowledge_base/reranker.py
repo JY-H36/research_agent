@@ -1,30 +1,51 @@
 """
-Cross-Encoder 重排序模块
-用 BAAI/bge-reranker-large 对候选 chunk 精排，解决概念匹配问题
+Cross-Encoder 重排序模块（可选增强）
+用 BAAI/bge-reranker-large 对候选 chunk 精排。若模型不可用则自动回退到 RRF 排序。
 """
+import os
 import logging
 from typing import List, Dict, Optional
-from sentence_transformers import CrossEncoder
 
 from config import RERANKER_MODEL, RETRIEVAL_TOP_K
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# 全局单例（延迟加载，首次使用时下载模型）
-_reranker: Optional[CrossEncoder] = None
+# 全局状态
+_reranker = None           # CrossEncoder 实例 或 None
+_reranker_failed = False   # True = 已尝试加载且失败，不再重试
 
 
-def get_reranker() -> CrossEncoder:
-    """获取 Cross-Encoder 单例"""
-    global _reranker
-    if _reranker is None:
+def get_reranker() -> Optional[object]:
+    """获取 Cross-Encoder。若加载失败返回 None"""
+    global _reranker, _reranker_failed
+
+    if _reranker is not None:
+        return _reranker
+    if _reranker_failed:
+        return None
+
+    try:
+        # 确保 HF 镜像在加载前已设置
+        os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
+
         logger.info("加载 Cross-Encoder 模型: %s", RERANKER_MODEL)
-        _reranker = CrossEncoder(
-            RERANKER_MODEL,
-            max_length=512,  # query+chunk 最大 token 数
+        from sentence_transformers import CrossEncoder
+        _reranker = CrossEncoder(RERANKER_MODEL, max_length=512)
+        logger.info("Cross-Encoder 模型加载完成 ✅")
+
+    except Exception as e:
+        _reranker_failed = True
+        _reranker = None
+        logger.warning(
+            "Cross-Encoder 模型加载失败 (%s)。网络不可达或模型未缓存。"
+            "此后将使用 RRF 排序，不影响检索功能。"
+            "如需启用重排序，请在有网络时手动运行: "
+            "python -c \"from sentence_transformers import CrossEncoder; "
+            "CrossEncoder('%s', max_length=512)\"",
+            e, RERANKER_MODEL
         )
-        logger.info("Cross-Encoder 模型加载完成")
+
     return _reranker
 
 
@@ -34,21 +55,14 @@ def rerank(
     top_k: int = RETRIEVAL_TOP_K,
 ) -> List[Dict]:
     """
-    用 Cross-Encoder 对候选 chunk 重排序
+    用 Cross-Encoder 重排序候选 chunk。模型不可用时自动回退 RRF。
 
-    参数:
-        query: 原始用户问题（非变体，用原问题打分最准确）
-        candidates: 候选列表，每项需含 "content" 字段
-        top_k: 返回数量
-
-    返回:
-        重排后的 top_k chunks，每项额外包含 "rerank_score"
+    返回: 重排后的 top_k chunks
     """
     if not candidates:
-        logger.debug("重排序: 候选为空")
         return []
 
-    # 去重（按 chunk_id）
+    # 去重
     seen = set()
     unique_candidates = []
     for c in candidates:
@@ -62,37 +76,29 @@ def rerank(
     if not unique_candidates:
         return []
 
-    logger.debug("重排序: query='%s', 候选数=%d (去重后)", query[:100], len(unique_candidates))
+    logger.debug("重排序: query='%s', 候选数=%d", query[:100], len(unique_candidates))
 
-    try:
-        model = get_reranker()
+    # 尝试 Cross-Encoder 重排
+    model = get_reranker()
+    if model is not None:
+        try:
+            pairs = [(query, c.get("content", "")) for c in unique_candidates]
+            scores = model.predict(pairs, show_progress_bar=False)
+            for i, c in enumerate(unique_candidates):
+                c["rerank_score"] = round(float(scores[i]), 4)
+            unique_candidates.sort(key=lambda x: x.get("rerank_score", 0), reverse=True)
+            top = unique_candidates[:top_k]
+            if top:
+                logger.info("重排序完成 (Cross-Encoder): top_score=%.4f", top[0].get("rerank_score", 0))
+            return top
+        except Exception as e:
+            logger.error("Cross-Encoder 打分失败: %s，回退 RRF", e)
 
-        # 构建 (query, document) 对
-        pairs = [(query, c.get("content", "")) for c in unique_candidates]
-
-        # Cross-Encoder 打分（一批完成）
-        scores = model.predict(pairs, show_progress_bar=False)
-
-        # 绑定分数
-        for i, c in enumerate(unique_candidates):
-            c["rerank_score"] = round(float(scores[i]), 4)
-
-        # 按分数降序排序
-        unique_candidates.sort(key=lambda x: x.get("rerank_score", 0), reverse=True)
-
-        top = unique_candidates[:top_k]
-
-        logger.info("重排序完成: top_score=%.4f, bottom_score=%.4f",
-                   top[0].get("rerank_score", 0) if top else 0,
-                   top[-1].get("rerank_score", 0) if top else 0)
-
-        return top
-
-    except Exception as e:
-        logger.error("重排序失败: %s，回退到 RRF 排序", e, exc_info=True)
-        # 失败时回退到 RRF 分数排序
-        unique_candidates.sort(
-            key=lambda x: x.get("rrf_score", x.get("rerank_score", 0)),
-            reverse=True,
-        )
-        return unique_candidates[:top_k]
+    # 回退: RRF 排序
+    unique_candidates.sort(
+        key=lambda x: x.get("rrf_score", 0), reverse=True
+    )
+    top = unique_candidates[:top_k]
+    if top:
+        logger.info("重排序完成 (RRF 回退): top_score=%.4f", top[0].get("rrf_score", 0))
+    return top

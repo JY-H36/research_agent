@@ -1,0 +1,29 @@
+# 环境 & 密钥
+.env
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# 日志
+logs/
+
+# 向量库
+chroma_db/
+
+# 上传文件
+uploads/
+
+# IDE
+.vscode/
+.idea/
+
+# 临时文件
+*.tmp
+_test*.py
+_tq.py
+_t.py
