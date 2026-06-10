@@ -118,3 +118,9 @@ class Chunk(Base):
 
     def __repr__(self):
         return f"<Chunk(id={self.id}, doc_id={self.document_id}, section='{self.section_name}')>"
+
+
+# ============================================================
+# 确保知识图谱模型也被 Base.metadata 注册
+# ============================================================
+import knowledge_graph.models  # noqa: E402, F401 — 将 kg_* 表注册到 Base.metadata

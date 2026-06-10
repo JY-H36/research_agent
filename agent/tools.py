@@ -5,6 +5,8 @@ import logging
 from typing import Dict, List
 
 from knowledge_base.retriever import get_retriever
+from knowledge_graph.graph_tool import QUERY_PAPER_GRAPH_TOOL_DEF, execute_query_paper_graph
+from knowledge_graph.entity_normalizer import normalize_all_entities
 from config import RETRIEVAL_TOP_K
 from utils.logger import get_logger
 
@@ -77,7 +79,31 @@ TOOL_DEFINITIONS = [
                 "required": ["query"]
             }
         }
-    }
+    },
+    QUERY_PAPER_GRAPH_TOOL_DEF,
+    {
+        "type": "function",
+        "function": {
+            "name": "normalize_knowledge_graph",
+            "description": (
+                "归一化知识图谱中的实体名称。将同一实体（方法/数据集/任务）的不同表述合并为规范名称。"
+                "例如 'wav2vec2' 和 'wav2vec 2.0' 会被识别为同一方法，"
+                "'partial spoof detection' 和 'partially fake audio detection' 会被合并。"
+                "数据集额外依据引用文献一致性判断是否为同一数据集。"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "dry_run": {
+                        "type": "boolean",
+                        "description": "如果为 true，只分析不实际合并，返回会发现哪些重复",
+                        "default": False,
+                    },
+                },
+                "required": []
+            }
+        }
+    },
 ]
 
 
@@ -94,6 +120,10 @@ def execute_tool(tool_name: str, arguments: Dict) -> Dict:
         return _search_knowledge_base(arguments)
     elif tool_name == "search_papers_online":
         return _search_papers_online(arguments)
+    elif tool_name == "query_paper_graph":
+        return _query_paper_graph(arguments)
+    elif tool_name == "normalize_knowledge_graph":
+        return _normalize_knowledge_graph(arguments)
     else:
         logger.warning("未知工具调用: %s", tool_name)
         return {"success": False, "result": None, "error": f"未知工具: {tool_name}"}
@@ -230,6 +260,54 @@ def _search_papers_online(args: Dict) -> Dict:
         return {"success": False, "result": None, "error": str(e)}
 
 
+def _query_paper_graph(args: Dict) -> Dict:
+    """执行知识图谱查询"""
+    try:
+        result = execute_query_paper_graph(args)
+        return result
+    except Exception as e:
+        logger.error("知识图谱查询异常: %s", e, exc_info=True)
+        return {"success": False, "result": None, "error": str(e)}
+
+
+def _normalize_knowledge_graph(args: Dict) -> Dict:
+    """执行知识图谱实体归一化"""
+    try:
+        dry_run = args.get("dry_run", False)
+        result = normalize_all_entities(dry_run=dry_run)
+        # 格式化给 LLM 看的文本
+        lines = []
+        if dry_run:
+            lines.append("【知识图谱归一化分析（仅分析，未执行合并）】\n")
+        else:
+            lines.append("【知识图谱归一化完成】\n")
+
+        for entity_type in ["methods", "datasets", "tasks"]:
+            info = result.get(entity_type, {})
+            groups = info.get("groups", 0)
+            merged = info.get("merged", 0)
+            label = {"methods": "方法", "datasets": "数据集", "tasks": "任务"}[entity_type]
+            if groups > 0:
+                lines.append(f"- {label}: 发现 {groups} 组可合并, 实际合并 {merged} 个实体")
+
+        if result.get("details"):
+            lines.append("\n合并详情:")
+            for d in result["details"][:20]:
+                lines.append(f"- [{d['type']}] 「{d['canonical']}」 ← {d['aliases']}")
+
+        if result.get("error"):
+            lines.append(f"\n⚠️ 归一化出错: {result['error']}")
+
+        return {
+            "success": True,
+            "result": "\n".join(lines),
+            "data": result,
+        }
+    except Exception as e:
+        logger.error("知识图谱归一化异常: %s", e, exc_info=True)
+        return {"success": False, "result": None, "error": str(e)}
+
+
 def _format_paper_results(papers: List[Dict], query: str) -> Dict:
     """格式化论文结果：llm_text 给 LLM（简洁），papers 给前端卡片"""
     llm_lines = [f"检索到 {len(papers)} 篇与「{query}」相关的论文。请对以下论文进行简要总结分析："]
@@ -309,5 +387,16 @@ def get_tool_result_summary(tool_name: str, result: Dict) -> str:
         if papers:
             return f"检索到 {len(papers)} 篇论文"
         return "未检索到相关论文"
+
+    if tool_name == "query_paper_graph":
+        from knowledge_graph.graph_tool import get_tool_result_summary as kg_summary
+        return kg_summary(result)
+
+    if tool_name == "normalize_knowledge_graph":
+        data = result.get("data", {})
+        total = (data.get("methods", {}).get("merged", 0) +
+                 data.get("datasets", {}).get("merged", 0) +
+                 data.get("tasks", {}).get("merged", 0))
+        return f"归一化完成: 合并 {total} 个重复实体"
 
     return "执行成功"

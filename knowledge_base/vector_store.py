@@ -102,7 +102,15 @@ def get_chunk_count() -> int:
 
 
 def clear_collection():
+    """清空 collection 中的所有数据（保留 collection 本身）"""
     try:
-        _client.delete_collection(CHROMA_COLLECTION_NAME)
-    except Exception:
-        pass
+        collection = get_collection()
+        total = collection.count()
+        if total > 0:
+            # get() 默认只返回少量结果，必须指定 limit 才能拿到全部 ID
+            all_ids = collection.get(limit=total, include=[])["ids"]
+            if all_ids:
+                collection.delete(ids=all_ids)
+            logger.info("Chroma 已清空: 删除 %d 条记录", len(all_ids))
+    except Exception as e:
+        logger.warning("Chroma 清空失败: %s", e)

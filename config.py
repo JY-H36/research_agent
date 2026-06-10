@@ -61,6 +61,15 @@ UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
 ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md"}
 
 # ============================================================
+# 知识图谱配置
+# ============================================================
+KG_ENABLE_LLM_EXTRACTION = True   # 是否启用 LLM 实体提取（上传论文后自动提取方法/数据集/指标）
+KG_LLM_EXTRACTION_ASYNC = False   # LLM 提取是否异步（v2.0 先同步）
+KG_PAPER_EXTRACTION_MAX_CHARS = 50000  # 论文提取 Agent 最大文本长度（利用 Qwen3-max 长上下文）
+KG_NORMALIZATION_USE_LLM = True        # 是否使用 LLM 做实体归一化（替代纯模糊匹配）
+KG_RESOLVER_USE_LLM = True             # 是否使用 LLM 做入库时实体消歧（L3 语义判断）
+
+# ============================================================
 # LLM 参数
 # ============================================================
 LLM_TEMPERATURE = 0.7

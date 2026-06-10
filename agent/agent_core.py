@@ -52,7 +52,30 @@ SYSTEM_PROMPT = """你是一个科研灵感助手 Agent，核心能力是**基�
 ### 4. 联网搜索（辅助工具）
 当知识库中确实找不到相关内容、或用户明确要求查找最新发表/未收录的论文时，使用 search_papers_online 联网搜索。联网搜索结果作为知识库的补充，优先级低于知识库已有论文。
 
-### 5. 科研想法评审
+### 5. 知识图谱查询（新增）
+当用户问"哪些论文用了 X 方法"、"X 数据集上有哪些相关论文"、"这个领域有哪些常用方法"、"某位作者有哪些论文"、"知识库中论文的性能排名"、"哪些方法经常一起使用"、"与某论文相关的其他论文有哪些"、"这个领域有什么研究空白"等需要从论文元数据（方法、数据集、作者、指标、任务）中获取结构化信息的问题时，使用 query_paper_graph。
+
+图谱中包含以下实体及其关系：
+- 论文 (Paper): 标题、年份、摘要、关键词、引用数
+- 作者 (Author): 姓名、所属机构
+- 方法 (Method): 名称、类别（特征提取器/分类器/损失函数/数据增强/框架等）
+- 数据集 (Dataset): 名称、领域、任务
+- 评价指标 (Metric): 名称（EER/min t-DCF/accuracy等）
+- 研究任务 (Task): 名称、层级关系
+
+图谱查询类型：
+- papers_by_method: 哪些论文用了某方法
+- papers_by_dataset: 哪些论文在某个数据集上评测
+- papers_by_author: 某位作者的论文
+- papers_by_task: 某个研究任务的论文
+- performance_ranking: 某数据集上的性能排名
+- related_papers: 与某论文最相关的其他论文
+- method_co_occurrence: 哪些方法经常组合使用
+- dataset_co_occurrence: 哪些数据集经常同时出现
+- research_gap: 发现可能的研究空白
+- method_evolution: 方法的演进链
+
+### 6. 科研想法评审
 当用户提出具体的科研想法时：
 1. 先从知识库检索相关工作
 2. 分析该想法与现有工作的异同
@@ -126,6 +149,7 @@ class ResearchAgent:
         all_tool_calls = []
         all_retrieved_chunks = []
         all_papers = []
+        all_graph_data = []  # 知识图谱查询结果
 
         try:
             # 第 1 轮：LLM 决策 + 执行工具
@@ -154,6 +178,11 @@ class ResearchAgent:
                         all_retrieved_chunks.extend(result["chunks"])
                     if tc["name"] == "search_papers_online" and result.get("papers"):
                         all_papers.extend(result["papers"])
+                    if tc["name"] == "query_paper_graph" and result.get("data"):
+                        all_graph_data.append({
+                            "query_type": tc["arguments"].get("query_type", ""),
+                            "data": result["data"],
+                        })
 
                     # 收集工具结果文本
                     result_text = result.get("result", "")
@@ -217,6 +246,7 @@ class ResearchAgent:
             "tool_calls": all_tool_calls,
             "retrieved_chunks": all_retrieved_chunks,
             "papers": all_papers,
+            "graph_data": all_graph_data,
             "middleware_logs": self.middleware.get_logs(),
         }
 

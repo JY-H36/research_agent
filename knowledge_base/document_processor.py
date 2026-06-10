@@ -205,14 +205,15 @@ def extract_text_from_txt(file_path: str) -> str:
 # ============================================================
 # 完整处理流程
 # ============================================================
-def process_document(file_path: str) -> Tuple[str, List[Dict]]:
+def process_document(file_path: str) -> Tuple[str, List[Dict], str]:
     """
     处理文档的完整流程
     PDF → Docling 转 MD → 按 ##/### 标题分块
     TXT → 直接按 MD 标题分块
 
-    返回: (file_md5, chunks_list)
+    返回: (file_md5, chunks_list, md_text)
       chunks_list: [{"section_name": str, "level": int, "chunk_index": int, "content": str}, ...]
+      md_text: Docling 转换后的 Markdown 全文（供知识图谱实体提取使用）
     """
     logger.info("开始处理文档: %s", os.path.basename(file_path))
 
@@ -244,4 +245,4 @@ def process_document(file_path: str) -> Tuple[str, List[Dict]]:
         raise ValueError(f"文档分块结果为空（文本长度 {len(md_text)} 字符），请检查文件内容")
 
     logger.info("文档处理完成: %s, %d chunks", os.path.basename(file_path), len(chunks))
-    return file_md5, chunks
+    return file_md5, chunks, md_text
